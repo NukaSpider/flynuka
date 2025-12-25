@@ -16,6 +16,13 @@ const themeIcon = document.getElementById('themeIcon');
 let turnstileWidgetId = null;
 let turnstileToken = null;
 
+// Rate limiting - prevent spam submissions
+let lastSubmissionTime = 0;
+const MIN_SUBMISSION_INTERVAL = 10000; // 10 seconds between submissions
+let submissionAttempts = 0;
+const MAX_SUBMISSION_ATTEMPTS = 5;
+const RATE_LIMIT_RESET_TIME = 60000; // Reset after 1 minute
+
 // ===== Initialize =====
 document.addEventListener('DOMContentLoaded', () => {
     initializeTheme();
@@ -380,9 +387,60 @@ function resetTurnstile() {
     }
 }
 
+// ===== Input Sanitization =====
+function sanitizeInput(input) {
+    if (typeof input !== 'string') return '';
+    
+    // Remove potentially dangerous characters and scripts
+    return input
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // Remove script tags
+        .replace(/<[^>]+>/g, '') // Remove HTML tags
+        .replace(/javascript:/gi, '') // Remove javascript: protocol
+        .replace(/on\w+\s*=/gi, '') // Remove event handlers
+        .trim();
+}
+
+function validateEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+function validateName(name) {
+    // Allow letters, spaces, hyphens, apostrophes, and periods
+    const nameRegex = /^[A-Za-z\s\-'\.]{2,100}$/;
+    return nameRegex.test(name);
+}
+
 // ===== Form Submission =====
 function handleFormSubmit(e) {
     e.preventDefault();
+    
+    // Rate limiting check
+    const currentTime = Date.now();
+    const timeSinceLastSubmission = currentTime - lastSubmissionTime;
+    
+    if (timeSinceLastSubmission < MIN_SUBMISSION_INTERVAL) {
+        const remainingTime = Math.ceil((MIN_SUBMISSION_INTERVAL - timeSinceLastSubmission) / 1000);
+        showFormMessage(`Please wait ${remainingTime} second${remainingTime > 1 ? 's' : ''} before submitting again.`, 'error');
+        return;
+    }
+    
+    // Check submission attempts
+    if (submissionAttempts >= MAX_SUBMISSION_ATTEMPTS) {
+        showFormMessage('Too many submission attempts. Please wait a minute before trying again.', 'error');
+        setTimeout(() => {
+            submissionAttempts = 0;
+        }, RATE_LIMIT_RESET_TIME);
+        return;
+    }
+    
+    // Honeypot check - if this field is filled, it's likely a bot
+    const honeypotField = document.getElementById('website');
+    if (honeypotField && honeypotField.value) {
+        console.warn('Bot detected: honeypot field was filled');
+        showFormMessage('Invalid submission detected.', 'error');
+        return;
+    }
     
     // Check if EmailJS is configured
     if (!siteConfig.emailjs.serviceId || 
@@ -396,16 +454,70 @@ function handleFormSubmit(e) {
         return;
     }
     
+    // Get and sanitize form data
+    const rawFormData = {
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        subject: document.getElementById('subject').value,
+        message: document.getElementById('message').value
+    };
+    
     const formData = {
-        name: document.getElementById('name').value.trim(),
-        email: document.getElementById('email').value.trim(),
-        subject: document.getElementById('subject').value.trim(),
-        message: document.getElementById('message').value.trim()
+        name: sanitizeInput(rawFormData.name),
+        email: sanitizeInput(rawFormData.email).toLowerCase(),
+        subject: sanitizeInput(rawFormData.subject),
+        message: sanitizeInput(rawFormData.message)
     };
 
     // Validate form data
     if (!formData.name || !formData.email || !formData.subject || !formData.message) {
         showFormMessage('Please fill in all fields.', 'error');
+        submissionAttempts++;
+        return;
+    }
+    
+    // Validate email format
+    if (!validateEmail(formData.email)) {
+        showFormMessage('Please enter a valid email address.', 'error');
+        submissionAttempts++;
+        return;
+    }
+    
+    // Validate name format
+    if (!validateName(formData.name)) {
+        showFormMessage('Please enter a valid name (2-100 characters, letters, spaces, hyphens, apostrophes, and periods only).', 'error');
+        submissionAttempts++;
+        return;
+    }
+    
+    // Validate length limits
+    if (formData.name.length > 100) {
+        showFormMessage('Name is too long (maximum 100 characters).', 'error');
+        submissionAttempts++;
+        return;
+    }
+    
+    if (formData.email.length > 254) {
+        showFormMessage('Email is too long (maximum 254 characters).', 'error');
+        submissionAttempts++;
+        return;
+    }
+    
+    if (formData.subject.length > 200) {
+        showFormMessage('Subject is too long (maximum 200 characters).', 'error');
+        submissionAttempts++;
+        return;
+    }
+    
+    if (formData.message.length > 2000) {
+        showFormMessage('Message is too long (maximum 2000 characters).', 'error');
+        submissionAttempts++;
+        return;
+    }
+    
+    if (formData.message.length < 10) {
+        showFormMessage('Message is too short (minimum 10 characters).', 'error');
+        submissionAttempts++;
         return;
     }
 
@@ -413,9 +525,14 @@ function handleFormSubmit(e) {
     if (siteConfig.turnstile.siteKey && siteConfig.turnstile.siteKey !== 'YOUR_TURNSTILE_SITE_KEY') {
         if (!turnstileToken) {
             showFormMessage('Please complete the security verification.', 'error');
+            submissionAttempts++;
             return;
         }
     }
+    
+    // Update rate limiting
+    lastSubmissionTime = currentTime;
+    submissionAttempts++;
     
     // Show loading state
     const submitButton = contactForm.querySelector('button[type="submit"]');
@@ -452,6 +569,9 @@ function handleFormSubmit(e) {
         
         // Reset Turnstile
         resetTurnstile();
+        
+        // Reset rate limiting on successful submission
+        submissionAttempts = 0;
         
         // Reset button state
         submitButton.disabled = false;

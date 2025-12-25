@@ -866,6 +866,22 @@ section {
     margin-bottom: 1rem;
 }
 
+/* ===== Honeypot Field (Bot Protection) ===== */
+.honeypot-field {
+    position: absolute !important;
+    left: -9999px !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    width: 0 !important;
+    overflow: hidden !important;
+}
+
+.honeypot-field input {
+    display: none !important;
+}
+
 /* ===== Turnstile Container ===== */
 .turnstile-container {
     margin: 1.5rem 0;

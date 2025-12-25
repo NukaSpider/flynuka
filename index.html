@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://api.emailjs.com https://challenges.cloudflare.com;">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>Flynuka - Drone Photography and Videography | Joseph Duguay</title>
     <meta name="description" content="Professional drone photography and videography services by Joseph Duguay, certified remote pilot.">
     <link rel="stylesheet" href="styles.css">
@@ -156,20 +161,24 @@
                 <div class="contact-form-container">
                     <form class="contact-form" id="contactForm">
                         <div class="form-group">
-                            <input type="text" id="name" name="name" placeholder="" required>
+                            <input type="text" id="name" name="name" placeholder="" required maxlength="100" pattern="[A-Za-z\s\-'\.]{2,100}">
                             <label for="name">Name</label>
                         </div>
                         <div class="form-group">
-                            <input type="email" id="email" name="email" placeholder="" required>
+                            <input type="email" id="email" name="email" placeholder="" required maxlength="254">
                             <label for="email">Email</label>
                         </div>
                         <div class="form-group">
-                            <input type="text" id="subject" name="subject" placeholder="" required>
+                            <input type="text" id="subject" name="subject" placeholder="" required maxlength="200">
                             <label for="subject">Subject</label>
                         </div>
                         <div class="form-group">
-                            <textarea id="message" name="message" placeholder="" rows="5" required></textarea>
+                            <textarea id="message" name="message" placeholder="" rows="5" required maxlength="2000"></textarea>
                             <label for="message">Message</label>
+                        </div>
+                        <!-- Honeypot field - hidden from users but visible to bots -->
+                        <div class="honeypot-field" style="position: absolute; left: -9999px; opacity: 0; pointer-events: none;">
+                            <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
                         </div>
                         <div class="turnstile-container">
                             <div class="cf-turnstile" id="turnstile-widget" data-sitekey="YOUR_TURNSTILE_SITE_KEY" data-theme="light" data-size="normal"></div>

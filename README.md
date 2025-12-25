@@ -7,7 +7,13 @@ A modern, responsive portfolio website for drone photography and videography ser
 - 🎨 Modern, clean design with dark mode support
 - 📱 Fully responsive layout
 - ✉️ Contact form with EmailJS integration
-- 🛡️ Cloudflare Turnstile spam protection
+- 🛡️ **Enterprise-grade security**:
+  - Cloudflare Turnstile bot protection
+  - Honeypot field for bot detection
+  - Rate limiting (10s between submissions, 5 max per minute)
+  - Input sanitization and validation
+  - XSS protection with Content Security Policy
+  - Security headers (X-Frame-Options, X-Content-Type-Options, etc.)
 - 🎭 Smooth animations and transitions
 - 🖼️ Portfolio gallery with filtering
 
@@ -71,6 +77,19 @@ Edit `config.js` to customize:
 4. Add them to your `.env` file
 
 See `CLOUDFLARE_SETUP.md` for detailed setup instructions.
+
+## Security
+
+This site implements multiple layers of security protection:
+
+- **Cloudflare Turnstile**: Bot protection and spam prevention
+- **Honeypot Field**: Hidden field that detects automated bots
+- **Rate Limiting**: Prevents spam and abuse (10s between submissions)
+- **Input Sanitization**: Prevents XSS attacks
+- **Input Validation**: Email, name, and length validation
+- **Security Headers**: X-Frame-Options, CSP, and more
+
+For detailed security information, see [SECURITY.md](SECURITY.md).
 
 ## Project Structure
 
