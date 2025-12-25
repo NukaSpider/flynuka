@@ -79,13 +79,13 @@ function initializeSite() {
     
     if (personalInterests && siteConfig.personal && siteConfig.personal.interests) {
         personalInterests.innerHTML = `
-            <h4 style="margin-bottom: 1rem; color: var(--text-primary); font-size: 1.1rem;">
+            <h4 style="margin-bottom: 0.75rem; color: var(--text-primary); font-size: 1.05rem;">
                 <i class="fas fa-heart" style="color: var(--primary-green); margin-right: 0.5rem;"></i>
                 What I'm Into
             </h4>
-            <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
+            <div style="display: flex; flex-wrap: wrap; gap: 0.6rem;">
                 ${siteConfig.personal.interests.map(interest => `
-                    <span style="display: inline-block; padding: 0.5rem 1rem; background: var(--bg-secondary); border-radius: 20px; font-size: 0.9rem; color: var(--text-secondary); border: 1px solid var(--border-color);">
+                    <span style="display: inline-block; padding: 0.4rem 0.9rem; background: var(--bg-secondary); border-radius: 20px; font-size: 0.9rem; color: var(--text-secondary); border: 1px solid var(--border-color);">
                         ${interest}
                     </span>
                 `).join('')}
