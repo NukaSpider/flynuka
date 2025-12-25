@@ -60,7 +60,8 @@ if (typeof window === 'undefined' && typeof require !== 'undefined') {
     { placeholder: 'YOUR_TEMPLATE_ID', value: envVars.EMAILJS_TEMPLATE_ID || 'YOUR_TEMPLATE_ID' },
     { placeholder: 'YOUR_PUBLIC_KEY', value: envVars.EMAILJS_PUBLIC_KEY || 'YOUR_PUBLIC_KEY' },
     { placeholder: 'YOUR_TURNSTILE_SITE_KEY', value: envVars.TURNSTILE_SITE_KEY || 'YOUR_TURNSTILE_SITE_KEY' },
-    { placeholder: 'YOUR_TURNSTILE_SECRET_KEY', value: envVars.TURNSTILE_SECRET_KEY || 'YOUR_TURNSTILE_SECRET_KEY' }
+    { placeholder: 'YOUR_TURNSTILE_SECRET_KEY', value: envVars.TURNSTILE_SECRET_KEY || 'YOUR_TURNSTILE_SECRET_KEY' },
+    { placeholder: 'YOUR_SHORTIO_API_KEY', value: envVars.SHORTIO_API_KEY || 'YOUR_SHORTIO_API_KEY' }
   ];
   
   replacements.forEach(({ placeholder, value }) => {
@@ -74,6 +75,11 @@ if (typeof window === 'undefined' && typeof require !== 'undefined') {
     // Replace in turnstile section
     configContent = configContent.replace(
       new RegExp(`(siteKey|secretKey):\\s*"${escapedPlaceholder}"`, 'g'),
+      (match, key) => `${key}: "${value}"`
+    );
+    // Replace in shortio section
+    configContent = configContent.replace(
+      new RegExp(`(apiKey):\\s*"${escapedPlaceholder}"`, 'g'),
       (match, key) => `${key}: "${value}"`
     );
   });
@@ -216,6 +222,14 @@ const siteConfig = {
   turnstile: {
     siteKey: "YOUR_TURNSTILE_SITE_KEY",
     secretKey: "YOUR_TURNSTILE_SECRET_KEY" // Keep private - for server-side verification
+  },
+  
+  // Short.io Configuration
+  // Get API key from https://app.short.io/
+  // Values are injected from .env file when you run: node config.js
+  shortio: {
+    apiKey: "YOUR_SHORTIO_API_KEY",
+    domain: "go.flynuka.com"
   }
 };
 

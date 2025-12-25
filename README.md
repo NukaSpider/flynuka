@@ -7,6 +7,7 @@ A modern, responsive portfolio website for drone photography and videography ser
 - 🎨 Modern, clean design with dark mode support
 - 📱 Fully responsive layout
 - ✉️ Contact form with EmailJS integration
+- 🔗 Short link creator (hidden page) using Short.io for go.flynuka.com
 - 🛡️ **Enterprise-grade security**:
   - Cloudflare Turnstile bot protection
   - Honeypot field for bot detection
@@ -34,6 +35,7 @@ A modern, responsive portfolio website for drone photography and videography ser
      EMAILJS_PUBLIC_KEY=your_public_key
      TURNSTILE_SITE_KEY=your_turnstile_site_key
      TURNSTILE_SECRET_KEY=your_turnstile_secret_key
+     SHORTIO_API_KEY=your_shortio_api_key
      ```
 
 3. **Inject environment variables into config**
@@ -75,6 +77,13 @@ Edit `config.js` to customize:
 2. Create a Turnstile site
 3. Get your Site Key and Secret Key
 4. Add them to your `.env` file
+
+### Short.io (Optional - for short link creator)
+1. Sign up at [Short.io](https://app.short.io/)
+2. Add your domain (go.flynuka.com)
+3. Get your API key from Settings → API
+4. Add `SHORTIO_API_KEY` to your `.env` file
+5. Access the short link creator at `/shortlink.html` (hidden page)
 
 See `CLOUDFLARE_SETUP.md` for detailed setup instructions.
 

@@ -77,6 +77,7 @@ npm start
 - `EMAILJS_PUBLIC_KEY` - Your EmailJS Public Key
 - `TURNSTILE_SITE_KEY` - Your Cloudflare Turnstile Site Key
 - `TURNSTILE_SECRET_KEY` - Your Cloudflare Turnstile Secret Key
+- `SHORTIO_API_KEY` - Your Short.io API Key (for short link creator)
 
 **How it works:**
 - During build, `npm run build` runs `npm run generate-env`
