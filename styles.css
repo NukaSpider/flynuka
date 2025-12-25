@@ -294,19 +294,9 @@ body {
 .hero-subtitle {
     font-size: clamp(1.2rem, 2vw, 1.5rem);
     color: var(--text-secondary);
-    margin-bottom: 1.5rem;
+    margin-bottom: 2.5rem;
     font-weight: 400;
     animation: fadeInUp 1s ease-out 0.8s both;
-}
-
-.hero-personal {
-    font-size: clamp(1rem, 1.5vw, 1.1rem);
-    color: var(--text-secondary);
-    line-height: 1.7;
-    max-width: 700px;
-    margin: 0 auto 2.5rem;
-    font-weight: 400;
-    animation: fadeInUp 1s ease-out 1s both;
 }
 
 .hero-cta {
@@ -314,7 +304,7 @@ body {
     gap: 1.5rem;
     justify-content: center;
     flex-wrap: wrap;
-    animation: fadeInUp 1s ease-out 1.2s both;
+    animation: fadeInUp 1s ease-out 1s both;
 }
 
 @keyframes fadeInUp {
@@ -504,20 +494,20 @@ section {
 
 .about-description {
     font-size: 1.2rem;
-    line-height: 1.8;
+    line-height: 1.7;
     color: var(--text-secondary);
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.2rem;
 }
 
 .about-highlights {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0.8rem;
 }
 
 .highlight-item {
-    padding: 1.2rem;
+    padding: 1rem;
     background: var(--card-bg);
     border-radius: 10px;
     border-left: 4px solid var(--primary-green);
@@ -542,28 +532,28 @@ section {
 
 /* ===== Personal Section ===== */
 .personal-section {
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
+    margin-top: 1.2rem;
+    padding-top: 1.2rem;
     border-top: 1px solid var(--border-color);
 }
 
 .personal-intro {
     font-size: 1.1rem;
-    line-height: 1.7;
+    line-height: 1.6;
     color: var(--text-secondary);
-    margin-bottom: 1.2rem;
+    margin-bottom: 1rem;
 }
 
 .personal-interests {
-    margin-bottom: 1.2rem;
+    margin-bottom: 1rem;
 }
 
 .personal-note {
     font-style: italic;
     color: var(--text-tertiary);
     font-size: 0.95rem;
-    line-height: 1.6;
-    margin-top: 1rem;
+    line-height: 1.5;
+    margin-top: 0.8rem;
 }
 
 .about-visual {

@@ -41,12 +41,6 @@ function initializeSite() {
         heroSubtitle.textContent = `${siteConfig.name} • ${siteConfig.title}`;
     }
     
-    // Set hero personal intro
-    const heroPersonal = document.getElementById('heroPersonal');
-    if (heroPersonal && siteConfig.personal && siteConfig.personal.intro) {
-        heroPersonal.textContent = siteConfig.personal.intro;
-    }
-    
     // Update Turnstile widget with site key
     const turnstileWidget = document.getElementById('turnstile-widget');
     if (turnstileWidget && siteConfig.turnstile.siteKey && siteConfig.turnstile.siteKey !== 'YOUR_TURNSTILE_SITE_KEY') {
