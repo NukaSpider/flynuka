@@ -7,7 +7,8 @@
  * To update config with .env values: node config.js
  */
 
-// Node.js execution: Inject .env values into config.js
+// Node.js execution: Inject environment variable values into config.js
+// Works with both .env file (local) and process.env (Render/CI)
 if (typeof window === 'undefined' && typeof require !== 'undefined') {
   const fs = require('fs');
   const path = require('path');
@@ -15,30 +16,45 @@ if (typeof window === 'undefined' && typeof require !== 'undefined') {
   const envPath = path.join(__dirname, '.env');
   const configPath = path.join(__dirname, 'config.js');
   
-  // Read .env file
-  if (!fs.existsSync(envPath)) {
-    console.error('Error: .env file not found!');
-    console.error('Please create a .env file based on .env.example');
-    process.exit(1);
-  }
-  
-  const envContent = fs.readFileSync(envPath, 'utf8');
+  // Get environment variables from process.env (Render) or .env file (local)
   const envVars = {};
   
-  // Parse .env file
-  envContent.split('\n').forEach(line => {
-    line = line.trim();
-    if (!line || line.startsWith('#')) return;
-    const match = line.match(/^([^=]+)=(.*)$/);
-    if (match) {
-      envVars[match[1].trim()] = match[2].trim();
-    }
-  });
+  // First, try to read from process.env (Render environment variables)
+  if (process.env.EMAILJS_SERVICE_ID) {
+    envVars.EMAILJS_SERVICE_ID = process.env.EMAILJS_SERVICE_ID;
+    envVars.EMAILJS_TEMPLATE_ID = process.env.EMAILJS_TEMPLATE_ID;
+    envVars.EMAILJS_PUBLIC_KEY = process.env.EMAILJS_PUBLIC_KEY;
+    envVars.TURNSTILE_SITE_KEY = process.env.TURNSTILE_SITE_KEY;
+    envVars.TURNSTILE_SECRET_KEY = process.env.TURNSTILE_SECRET_KEY;
+    console.log('Using environment variables from process.env (Render/CI)');
+  } 
+  // Fallback to .env file if it exists (local development)
+  else if (fs.existsSync(envPath)) {
+    const envContent = fs.readFileSync(envPath, 'utf8');
+    
+    // Parse .env file
+    envContent.split('\n').forEach(line => {
+      line = line.trim();
+      if (!line || line.startsWith('#')) return;
+      const match = line.match(/^([^=]+)=(.*)$/);
+      if (match) {
+        envVars[match[1].trim()] = match[2].trim();
+      }
+    });
+    console.log('Using environment variables from .env file (local)');
+  } 
+  // No environment variables found
+  else {
+    console.warn('No environment variables found. Using placeholder values.');
+    console.warn('For local development: Create a .env file');
+    console.warn('For Render: Add environment variables in Render dashboard');
+    // Continue with placeholders - don't exit
+  }
   
   // Read config.js
   let configContent = fs.readFileSync(configPath, 'utf8');
   
-  // Replace placeholder values with actual values from .env
+  // Replace placeholder values with actual values from environment
   const replacements = [
     { placeholder: 'YOUR_SERVICE_ID', value: envVars.EMAILJS_SERVICE_ID || 'YOUR_SERVICE_ID' },
     { placeholder: 'YOUR_TEMPLATE_ID', value: envVars.EMAILJS_TEMPLATE_ID || 'YOUR_TEMPLATE_ID' },
@@ -64,7 +80,7 @@ if (typeof window === 'undefined' && typeof require !== 'undefined') {
   
   // Write the updated config.js
   fs.writeFileSync(configPath, configContent, 'utf8');
-  console.log('✓ Updated config.js with values from .env file');
+  console.log('✓ Updated config.js with environment variable values');
   process.exit(0);
 }
 
@@ -189,9 +205,9 @@ const siteConfig = {
   // Get these values from https://dashboard.emailjs.com/
   // Values are injected from .env file when you run: node config.js
   emailjs: {
-    serviceId: "YOUR_SERVICE_ID",
-    templateId: "YOUR_TEMPLATE_ID",
-    publicKey: "YOUR_PUBLIC_KEY"
+    serviceId: "service_yu1fcbi",
+    templateId: "template_6lbas8s",
+    publicKey: "JhDUSfAjpAQMBdV1n"
   },
   
   // Cloudflare Turnstile Configuration

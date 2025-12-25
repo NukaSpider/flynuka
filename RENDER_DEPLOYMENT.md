@@ -46,8 +46,10 @@ main
 
 **Build Command:**
 ```
-npm run generate-env || echo "Skipping env generation (no .env in production)"
+npm run generate-env
 ```
+
+*This will read environment variables from Render and inject them into config.js*
 
 **Publish Directory:**
 ```
@@ -63,20 +65,15 @@ Static Site
 
 Since this is a static site, you have two options:
 
-**Option A: Inject at Build Time (Recommended)**
+**Using Render Environment Variables (Recommended)**
 - Add environment variables in Render dashboard:
   - `EMAILJS_SERVICE_ID`
   - `EMAILJS_TEMPLATE_ID`
   - `EMAILJS_PUBLIC_KEY`
   - `TURNSTILE_SITE_KEY`
   - `TURNSTILE_SECRET_KEY`
-- Render will create a `.env` file during build
-- The build command will run `npm run generate-env` to inject values
-
-**Option B: Manual Configuration**
-- Don't add environment variables
-- Manually edit `config.js` after first deployment
-- Or use Render's file editor to update values
+- The build command (`npm run generate-env`) will automatically read these from `process.env` and inject them into `config.js`
+- No `.env` file needed - Render provides environment variables directly
 
 ### 4. Advanced Settings
 
