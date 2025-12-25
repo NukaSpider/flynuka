@@ -1,3 +1,65 @@
+#!/usr/bin/env node
+/**
+ * This file serves dual purposes:
+ * 1. When run with Node.js: Generates env.js from .env file
+ * 2. When loaded in browser: Provides site configuration
+ * 
+ * To generate env.js: node config.js
+ */
+
+// Node.js execution: Generate env.js from .env
+if (typeof window === 'undefined' && typeof require !== 'undefined') {
+  const fs = require('fs');
+  const path = require('path');
+  
+  const envPath = path.join(__dirname, '.env');
+  const outputPath = path.join(__dirname, 'env.js');
+  
+  // Read .env file
+  if (!fs.existsSync(envPath)) {
+    console.error('Error: .env file not found!');
+    console.error('Please create a .env file based on .env.example');
+    process.exit(1);
+  }
+  
+  const envContent = fs.readFileSync(envPath, 'utf8');
+  const envVars = {};
+  
+  // Parse .env file
+  envContent.split('\n').forEach(line => {
+    line = line.trim();
+    if (!line || line.startsWith('#')) return;
+    const match = line.match(/^([^=]+)=(.*)$/);
+    if (match) {
+      envVars[match[1].trim()] = match[2].trim();
+    }
+  });
+  
+  // Generate env.js
+  const jsContent = `// Environment variables from .env file
+// This file is auto-generated - do not edit manually
+// To update, edit .env and run: node config.js
+// This file is gitignored
+
+window.env = {
+  emailjs: {
+    serviceId: "${envVars.EMAILJS_SERVICE_ID || 'YOUR_SERVICE_ID'}",
+    templateId: "${envVars.EMAILJS_TEMPLATE_ID || 'YOUR_TEMPLATE_ID'}",
+    publicKey: "${envVars.EMAILJS_PUBLIC_KEY || 'YOUR_PUBLIC_KEY'}"
+  },
+  turnstile: {
+    siteKey: "${envVars.TURNSTILE_SITE_KEY || 'YOUR_TURNSTILE_SITE_KEY'}",
+    secretKey: "${envVars.TURNSTILE_SECRET_KEY || 'YOUR_TURNSTILE_SECRET_KEY'}"
+  }
+};
+`;
+  
+  fs.writeFileSync(outputPath, jsContent, 'utf8');
+  console.log('✓ Generated env.js from .env file');
+  process.exit(0);
+}
+
+// Browser execution: Site configuration
 // Site configuration
 const siteConfig = {
   // Personal Information
@@ -116,19 +178,28 @@ const siteConfig = {
   
   // EmailJS Configuration
   // Get these values from https://dashboard.emailjs.com/
-  // Values are injected from .env file via npm run generate-env
+  // Values are loaded from window.env (generated from .env file)
   emailjs: {
-    serviceId: "YOUR_SERVICE_ID",        // Updated from .env
-    templateId: "YOUR_TEMPLATE_ID",       // Updated from .env
-    publicKey: "YOUR_PUBLIC_KEY"          // Updated from .env
+    serviceId: "YOUR_SERVICE_ID",
+    templateId: "YOUR_TEMPLATE_ID",
+    publicKey: "YOUR_PUBLIC_KEY"
   },
   
   // Cloudflare Turnstile Configuration
   // Get these values from https://dash.cloudflare.com/
-  // Values are injected from .env file via npm run generate-env
+  // Values are loaded from window.env (generated from .env file)
   turnstile: {
-    siteKey: "YOUR_TURNSTILE_SITE_KEY",  // Updated from .env
-    secretKey: "YOUR_TURNSTILE_SECRET_KEY" // Updated from .env (keep private - for server-side verification)
+    siteKey: "YOUR_TURNSTILE_SITE_KEY",
+    secretKey: "YOUR_TURNSTILE_SECRET_KEY" // Keep private - for server-side verification
   }
 };
 
+// Load environment variables from window.env if available (generated from .env file)
+if (typeof window !== 'undefined' && window.env) {
+  if (window.env.emailjs) {
+    siteConfig.emailjs = { ...siteConfig.emailjs, ...window.env.emailjs };
+  }
+  if (window.env.turnstile) {
+    siteConfig.turnstile = { ...siteConfig.turnstile, ...window.env.turnstile };
+  }
+}

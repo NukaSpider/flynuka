@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Drone Photography and Videography Portfolio Website",
   "scripts": {
-    "generate-env": "node generate-env.js"
+    "generate-env": "node config.js"
   },
   "keywords": [],
   "author": "",
