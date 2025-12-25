@@ -71,7 +71,6 @@ function initializeSite() {
     // Set personal section
     const personalIntro = document.getElementById('personalIntro');
     const personalInterests = document.getElementById('personalInterests');
-    const personalNote = document.getElementById('personalNote');
     
     if (personalIntro && siteConfig.personal && siteConfig.personal.intro) {
         personalIntro.textContent = siteConfig.personal.intro;
@@ -91,10 +90,6 @@ function initializeSite() {
                 `).join('')}
             </div>
         `;
-    }
-    
-    if (personalNote && siteConfig.about && siteConfig.about.personalNote) {
-        personalNote.textContent = siteConfig.about.personalNote;
     }
 
     // Render services

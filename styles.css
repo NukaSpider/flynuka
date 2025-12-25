@@ -545,15 +545,7 @@ section {
 }
 
 .personal-interests {
-    margin-bottom: 1rem;
-}
-
-.personal-note {
-    font-style: italic;
-    color: var(--text-tertiary);
-    font-size: 0.95rem;
-    line-height: 1.5;
-    margin-top: 0.8rem;
+    margin-bottom: 0;
 }
 
 .about-visual {
