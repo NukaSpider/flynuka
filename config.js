@@ -1,19 +1,19 @@
 #!/usr/bin/env node
 /**
  * This file serves dual purposes:
- * 1. When run with Node.js: Generates env.js from .env file
+ * 1. When run with Node.js: Injects values from .env file into this config file
  * 2. When loaded in browser: Provides site configuration
  * 
- * To generate env.js: node config.js
+ * To update config with .env values: node config.js
  */
 
-// Node.js execution: Generate env.js from .env
+// Node.js execution: Inject .env values into config.js
 if (typeof window === 'undefined' && typeof require !== 'undefined') {
   const fs = require('fs');
   const path = require('path');
   
   const envPath = path.join(__dirname, '.env');
-  const outputPath = path.join(__dirname, 'env.js');
+  const configPath = path.join(__dirname, 'config.js');
   
   // Read .env file
   if (!fs.existsSync(envPath)) {
@@ -35,27 +35,36 @@ if (typeof window === 'undefined' && typeof require !== 'undefined') {
     }
   });
   
-  // Generate env.js
-  const jsContent = `// Environment variables from .env file
-// This file is auto-generated - do not edit manually
-// To update, edit .env and run: node config.js
-// This file is gitignored
-
-window.env = {
-  emailjs: {
-    serviceId: "${envVars.EMAILJS_SERVICE_ID || 'YOUR_SERVICE_ID'}",
-    templateId: "${envVars.EMAILJS_TEMPLATE_ID || 'YOUR_TEMPLATE_ID'}",
-    publicKey: "${envVars.EMAILJS_PUBLIC_KEY || 'YOUR_PUBLIC_KEY'}"
-  },
-  turnstile: {
-    siteKey: "${envVars.TURNSTILE_SITE_KEY || 'YOUR_TURNSTILE_SITE_KEY'}",
-    secretKey: "${envVars.TURNSTILE_SECRET_KEY || 'YOUR_TURNSTILE_SECRET_KEY'}"
-  }
-};
-`;
+  // Read config.js
+  let configContent = fs.readFileSync(configPath, 'utf8');
   
-  fs.writeFileSync(outputPath, jsContent, 'utf8');
-  console.log('✓ Generated env.js from .env file');
+  // Replace placeholder values with actual values from .env
+  const replacements = [
+    { placeholder: 'YOUR_SERVICE_ID', value: envVars.EMAILJS_SERVICE_ID || 'YOUR_SERVICE_ID' },
+    { placeholder: 'YOUR_TEMPLATE_ID', value: envVars.EMAILJS_TEMPLATE_ID || 'YOUR_TEMPLATE_ID' },
+    { placeholder: 'YOUR_PUBLIC_KEY', value: envVars.EMAILJS_PUBLIC_KEY || 'YOUR_PUBLIC_KEY' },
+    { placeholder: 'YOUR_TURNSTILE_SITE_KEY', value: envVars.TURNSTILE_SITE_KEY || 'YOUR_TURNSTILE_SITE_KEY' },
+    { placeholder: 'YOUR_TURNSTILE_SECRET_KEY', value: envVars.TURNSTILE_SECRET_KEY || 'YOUR_TURNSTILE_SECRET_KEY' }
+  ];
+  
+  replacements.forEach(({ placeholder, value }) => {
+    // Escape special regex characters
+    const escapedPlaceholder = placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // Replace in emailjs section
+    configContent = configContent.replace(
+      new RegExp(`(serviceId|templateId|publicKey):\\s*"${escapedPlaceholder}"`, 'g'),
+      (match, key) => `${key}: "${value}"`
+    );
+    // Replace in turnstile section
+    configContent = configContent.replace(
+      new RegExp(`(siteKey|secretKey):\\s*"${escapedPlaceholder}"`, 'g'),
+      (match, key) => `${key}: "${value}"`
+    );
+  });
+  
+  // Write the updated config.js
+  fs.writeFileSync(configPath, configContent, 'utf8');
+  console.log('✓ Updated config.js with values from .env file');
   process.exit(0);
 }
 
@@ -178,7 +187,7 @@ const siteConfig = {
   
   // EmailJS Configuration
   // Get these values from https://dashboard.emailjs.com/
-  // Values are loaded from window.env (generated from .env file)
+  // Values are injected from .env file when you run: node config.js
   emailjs: {
     serviceId: "YOUR_SERVICE_ID",
     templateId: "YOUR_TEMPLATE_ID",
@@ -187,19 +196,10 @@ const siteConfig = {
   
   // Cloudflare Turnstile Configuration
   // Get these values from https://dash.cloudflare.com/
-  // Values are loaded from window.env (generated from .env file)
+  // Values are injected from .env file when you run: node config.js
   turnstile: {
     siteKey: "YOUR_TURNSTILE_SITE_KEY",
     secretKey: "YOUR_TURNSTILE_SECRET_KEY" // Keep private - for server-side verification
   }
 };
 
-// Load environment variables from window.env if available (generated from .env file)
-if (typeof window !== 'undefined' && window.env) {
-  if (window.env.emailjs) {
-    siteConfig.emailjs = { ...siteConfig.emailjs, ...window.env.emailjs };
-  }
-  if (window.env.turnstile) {
-    siteConfig.turnstile = { ...siteConfig.turnstile, ...window.env.turnstile };
-  }
-}
