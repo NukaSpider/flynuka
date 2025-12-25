@@ -17,6 +17,7 @@ npm-debug.log*
 # Environment variables
 .env
 .env.local
+env-config.js
 
 # Build outputs (if any)
 dist/
