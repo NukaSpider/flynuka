@@ -1,47 +1,44 @@
 # Environment Configuration Setup
 
-This project uses environment variables to store sensitive configuration data (API keys, secrets, etc.) that should not be committed to version control.
+This project uses a `.env` file to store sensitive configuration data (API keys, secrets, etc.) that should not be committed to version control.
 
 ## Setup Instructions
 
-1. **Copy the environment configuration file:**
-   - The file `env-config.js` is gitignored and contains your sensitive API keys
-   - If you don't have this file yet, create it based on the structure below
-
-2. **Create `env-config.js` in the root directory:**
-   ```javascript
-   // Environment configuration for sensitive data
-   // This file is gitignored - do not commit it to version control
-
-   const envConfig = {
-     emailjs: {
-       serviceId: "your_emailjs_service_id",
-       templateId: "your_emailjs_template_id",
-       publicKey: "your_emailjs_public_key"
-     },
-     
-     turnstile: {
-       siteKey: "your_turnstile_site_key",
-       secretKey: "your_turnstile_secret_key"
-     }
-   };
+1. **Copy the example environment file:**
+   ```bash
+   cp .env.example .env
    ```
 
-3. **Update the values:**
+2. **Edit the `.env` file:**
+   - Open `.env` in your text editor
    - Replace the placeholder values with your actual API keys
    - Get EmailJS credentials from: https://dashboard.emailjs.com/
    - Get Cloudflare Turnstile keys from: https://dash.cloudflare.com/
 
+3. **Generate the JavaScript config file:**
+   ```bash
+   npm run generate-env
+   ```
+   
+   This will read your `.env` file and generate `env-config.js` which is used by the browser.
+
 ## How It Works
 
+- `.env` file contains your sensitive API keys in a standard format
+- `generate-env.js` script reads `.env` and generates `env-config.js` (gitignored)
 - `config.js` contains all non-sensitive configuration and default values
-- `env-config.js` (gitignored) contains only sensitive API keys
 - When both files are loaded, `config.js` automatically merges the values from `env-config.js`
 - This way, you can commit `config.js` to version control without exposing your API keys
 
+## Workflow
+
+1. Edit `.env` with your actual API keys
+2. Run `npm run generate-env` to regenerate `env-config.js`
+3. The website will use the values from `env-config.js`
+
 ## Important Notes
 
-- **Never commit `env-config.js` to version control** - it's already in `.gitignore`
-- If you're setting up the project for the first time, create `env-config.js` manually
-- The `.env` and `.env.example` files are optional and provided for reference only (they're not used by the application directly)
+- **Never commit `.env` or `env-config.js` to version control** - they're already in `.gitignore`
+- Always run `npm run generate-env` after updating `.env` to update the JavaScript config
+- The `.env.example` file is committed as a template for reference
 
