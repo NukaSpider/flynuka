@@ -7,7 +7,12 @@ const PORT = process.env.PORT || 3000;
 // Serve static files from the root directory
 app.use(express.static(path.join(__dirname)));
 
-// Handle all routes by serving index.html (for client-side routing if needed)
+// Handle shortlink route
+app.get('/shortlink', (req, res) => {
+  res.sendFile(path.join(__dirname, 'shortlink.html'));
+});
+
+// Handle all other routes by serving index.html (for client-side routing if needed)
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
