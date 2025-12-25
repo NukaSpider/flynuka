@@ -1,16 +1,16 @@
 #!/usr/bin/env node
 
 /**
- * Script to generate env-config.js from .env file
+ * Script to update config.js with values from .env file
  * This allows us to use a standard .env file format
- * and generate the JavaScript config file for the browser
+ * and inject the values directly into config.js
  */
 
 const fs = require('fs');
 const path = require('path');
 
 const envPath = path.join(__dirname, '.env');
-const outputPath = path.join(__dirname, 'env-config.js');
+const configPath = path.join(__dirname, 'config.js');
 
 // Read .env file
 if (!fs.existsSync(envPath)) {
@@ -40,27 +40,38 @@ envContent.split('\n').forEach(line => {
   }
 });
 
-// Generate env-config.js
-const jsContent = `// Environment configuration for sensitive data
-// This file is auto-generated from .env - do not edit manually
-// To update values, edit .env and run: npm run generate-env
-// This file is gitignored - do not commit it to version control
+// Read config.js
+let configContent = fs.readFileSync(configPath, 'utf8');
 
-const envConfig = {
-  emailjs: {
-    serviceId: "${envVars.EMAILJS_SERVICE_ID || 'YOUR_SERVICE_ID'}",
-    templateId: "${envVars.EMAILJS_TEMPLATE_ID || 'YOUR_TEMPLATE_ID'}",
-    publicKey: "${envVars.EMAILJS_PUBLIC_KEY || 'YOUR_PUBLIC_KEY'}"
-  },
+// Escape special characters for regex replacement
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Replace placeholder values with actual values from .env
+const replacements = [
+  { placeholder: 'YOUR_SERVICE_ID', value: envVars.EMAILJS_SERVICE_ID || 'YOUR_SERVICE_ID' },
+  { placeholder: 'YOUR_TEMPLATE_ID', value: envVars.EMAILJS_TEMPLATE_ID || 'YOUR_TEMPLATE_ID' },
+  { placeholder: 'YOUR_PUBLIC_KEY', value: envVars.EMAILJS_PUBLIC_KEY || 'YOUR_PUBLIC_KEY' },
+  { placeholder: 'YOUR_TURNSTILE_SITE_KEY', value: envVars.TURNSTILE_SITE_KEY || 'YOUR_TURNSTILE_SITE_KEY' },
+  { placeholder: 'YOUR_TURNSTILE_SECRET_KEY', value: envVars.TURNSTILE_SECRET_KEY || 'YOUR_TURNSTILE_SECRET_KEY' }
+];
+
+replacements.forEach(({ placeholder, value }) => {
+  // Replace in emailjs section
+  configContent = configContent.replace(
+    new RegExp(`(serviceId|templateId|publicKey):\\s*"${escapeRegex(placeholder)}"`, 'g'),
+    (match, key) => `${key}: "${value}"`
+  );
   
-  turnstile: {
-    siteKey: "${envVars.TURNSTILE_SITE_KEY || 'YOUR_TURNSTILE_SITE_KEY'}",
-    secretKey: "${envVars.TURNSTILE_SECRET_KEY || 'YOUR_TURNSTILE_SECRET_KEY'}"
-  }
-};
-`;
+  // Replace in turnstile section
+  configContent = configContent.replace(
+    new RegExp(`(siteKey|secretKey):\\s*"${escapeRegex(placeholder)}"`, 'g'),
+    (match, key) => `${key}: "${value}"`
+  );
+});
 
-// Write the generated file
-fs.writeFileSync(outputPath, jsContent, 'utf8');
-console.log('✓ Generated env-config.js from .env file');
+// Write the updated config.js
+fs.writeFileSync(configPath, configContent, 'utf8');
+console.log('✓ Updated config.js with values from .env file');
 

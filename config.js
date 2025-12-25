@@ -116,33 +116,19 @@ const siteConfig = {
   
   // EmailJS Configuration
   // Get these values from https://dashboard.emailjs.com/
-  // Sensitive values are loaded from env-config.js (gitignored)
+  // Values are injected from .env file via npm run generate-env
   emailjs: {
-    serviceId: "YOUR_SERVICE_ID",        // Overridden by env-config.js
-    templateId: "YOUR_TEMPLATE_ID",       // Overridden by env-config.js
-    publicKey: "YOUR_PUBLIC_KEY"          // Overridden by env-config.js
+    serviceId: "YOUR_SERVICE_ID",        // Updated from .env
+    templateId: "YOUR_TEMPLATE_ID",       // Updated from .env
+    publicKey: "YOUR_PUBLIC_KEY"          // Updated from .env
   },
   
   // Cloudflare Turnstile Configuration
   // Get these values from https://dash.cloudflare.com/
-  // Sensitive values are loaded from env-config.js (gitignored)
+  // Values are injected from .env file via npm run generate-env
   turnstile: {
-    siteKey: "YOUR_TURNSTILE_SITE_KEY",  // Overridden by env-config.js
-    secretKey: "YOUR_TURNSTILE_SECRET_KEY" // Overridden by env-config.js (keep private - for server-side verification)
+    siteKey: "YOUR_TURNSTILE_SITE_KEY",  // Updated from .env
+    secretKey: "YOUR_TURNSTILE_SECRET_KEY" // Updated from .env (keep private - for server-side verification)
   }
 };
-
-// Merge environment configuration if available
-// env-config.js is loaded before this file and contains sensitive data
-if (typeof envConfig !== 'undefined') {
-  // Deep merge emailjs config
-  if (envConfig.emailjs) {
-    siteConfig.emailjs = { ...siteConfig.emailjs, ...envConfig.emailjs };
-  }
-  
-  // Deep merge turnstile config
-  if (envConfig.turnstile) {
-    siteConfig.turnstile = { ...siteConfig.turnstile, ...envConfig.turnstile };
-  }
-}
 
