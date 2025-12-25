@@ -100,6 +100,22 @@ const siteConfig = {
   phone: "+1 (719) 666-1812",
   email: "contact@flynuka.com",
   
+  // Personal Information (for hybrid personal/business site)
+  personal: {
+    intro: "Hey, I'm Joseph! When I'm not flying drones professionally, you'll find me exploring the great outdoors, capturing moments that inspire me, or tinkering with the latest tech. I believe the best work comes from passion, and my passion is showing the world from a perspective most never get to see.",
+    interests: [
+      "Outdoor Adventure & Hiking",
+      "Photography & Cinematography",
+      "Technology & Innovation",
+      "Travel & Exploration"
+    ],
+    funFacts: [
+      "I've flown drones in over 20 different states",
+      "My favorite time to shoot is during golden hour",
+      "I'm always learning new aerial techniques"
+    ]
+  },
+  
   // Social Links (add or remove as needed)
   socialLinks: {
     instagram: {
@@ -198,22 +214,23 @@ const siteConfig = {
   // About Section
   about: {
     headline: "Elevating Perspectives Through Aerial Excellence",
-    description: "With years of experience as a certified remote pilot, I specialize in capturing breathtaking aerial imagery and cinematic footage. From commercial projects to personal events, I bring a unique perspective to every assignment.",
+    description: "With years of experience as a certified remote pilot, I specialize in capturing breathtaking aerial imagery and cinematic footage. From commercial projects to personal events, I bring a unique perspective to every assignment. When I'm not behind the controls, I'm exploring new locations, experimenting with creative techniques, and always pushing the boundaries of what's possible from above.",
     highlights: [
       "FAA Certified Remote Pilot",
       "Professional Grade Equipment",
       "Creative Vision & Technical Expertise",
       "Fully Insured & Licensed"
-    ]
+    ],
+    personalNote: "This isn't just a job for me—it's a passion. Every flight is an opportunity to see the world differently and share that perspective with others. Whether it's a commercial project or a personal adventure, I approach each flight with the same enthusiasm and attention to detail."
   },
   
   // EmailJS Configuration
   // Get these values from https://dashboard.emailjs.com/
   // Values are injected from .env file when you run: node config.js
   emailjs: {
-    serviceId: "YOUR_SERVICE_ID",
-    templateId: "YOUR_TEMPLATE_ID",
-    publicKey: "YOUR_PUBLIC_KEY"
+    serviceId: "service_yu1fcbi",
+    templateId: "template_6lbas8s",
+    publicKey: "JhDUSfAjpAQMBdV1n"
   },
   
   // Cloudflare Turnstile Configuration
