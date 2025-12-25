@@ -201,8 +201,9 @@ body {
     align-items: center;
     justify-content: center;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
     padding-top: 80px;
+    padding-bottom: 100px;
 }
 
 .hero-background {
@@ -293,9 +294,19 @@ body {
 .hero-subtitle {
     font-size: clamp(1.2rem, 2vw, 1.5rem);
     color: var(--text-secondary);
-    margin-bottom: 2.5rem;
+    margin-bottom: 1.5rem;
     font-weight: 400;
     animation: fadeInUp 1s ease-out 0.8s both;
+}
+
+.hero-personal {
+    font-size: clamp(1rem, 1.5vw, 1.1rem);
+    color: var(--text-secondary);
+    line-height: 1.7;
+    max-width: 700px;
+    margin: 0 auto 2.5rem;
+    font-weight: 400;
+    animation: fadeInUp 1s ease-out 1s both;
 }
 
 .hero-cta {
@@ -303,7 +314,7 @@ body {
     gap: 1.5rem;
     justify-content: center;
     flex-wrap: wrap;
-    animation: fadeInUp 1s ease-out 1s both;
+    animation: fadeInUp 1s ease-out 1.2s both;
 }
 
 @keyframes fadeInUp {
@@ -390,8 +401,10 @@ body {
     bottom: 30px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 1;
+    z-index: 10;
     animation: bounce 2s infinite;
+    opacity: 1;
+    visibility: visible;
 }
 
 @keyframes bounce {
@@ -411,8 +424,14 @@ body {
     height: 50px;
     border: 2px solid var(--text-primary);
     border-radius: 20px;
-    margin: 0 auto;
+    margin: 0 auto 10px;
     position: relative;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+.mouse:hover {
+    opacity: 1;
 }
 
 .wheel {
