@@ -110,6 +110,9 @@ function initializeSite() {
     // Set current year
     const currentYear = document.getElementById('currentYear');
     if (currentYear) currentYear.textContent = new Date().getFullYear();
+
+    // Initialize fun facts rotation
+    initializeFunFacts();
 }
 
 // ===== Render Services =====
@@ -637,6 +640,47 @@ function showFormMessage(message, type) {
         messageEl.style.animation = 'fadeOut 0.5s ease-out';
         setTimeout(() => messageEl.remove(), 500);
     }, duration);
+}
+
+// ===== Fun Facts Rotation =====
+let currentFunFactIndex = 0;
+let funFactInterval = null;
+
+function initializeFunFacts() {
+    const funFactContainer = document.getElementById('funFactsContainer');
+    const funFactText = document.getElementById('funFactText');
+    const funFactElement = document.getElementById('funFact');
+    
+    if (!funFactContainer || !funFactText || !siteConfig.personal || !siteConfig.personal.funFacts || siteConfig.personal.funFacts.length === 0) {
+        // Hide container if no fun facts
+        if (funFactContainer) {
+            funFactContainer.style.display = 'none';
+        }
+        return;
+    }
+    
+    const funFacts = siteConfig.personal.funFacts;
+    
+    // Display first fun fact
+    funFactText.textContent = funFacts[0];
+    funFactElement.classList.add('fade-in');
+    
+    // Rotate fun facts every 4 seconds
+    funFactInterval = setInterval(() => {
+        // Fade out
+        funFactElement.classList.remove('fade-in');
+        funFactElement.classList.add('fade-out');
+        
+        setTimeout(() => {
+            // Move to next fact
+            currentFunFactIndex = (currentFunFactIndex + 1) % funFacts.length;
+            funFactText.textContent = funFacts[currentFunFactIndex];
+            
+            // Fade in
+            funFactElement.classList.remove('fade-out');
+            funFactElement.classList.add('fade-in');
+        }, 500); // Wait for fade out to complete
+    }, 4000); // Change every 4 seconds
 }
 
 // ===== Scroll Animations =====
