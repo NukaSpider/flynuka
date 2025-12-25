@@ -605,6 +605,52 @@ section {
     font-size: 1.1rem;
 }
 
+/* ===== Fun Facts ===== */
+.fun-facts-container {
+    margin-top: 1.5rem;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fun-fact {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    background: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--border-color);
+    max-width: 300px;
+    text-align: center;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.fun-fact i {
+    color: var(--primary-green);
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.fun-fact span {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    font-style: italic;
+}
+
+.fun-fact.fade-out {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+.fun-fact.fade-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 @keyframes fadeInLeft {
     from {
         opacity: 0;
