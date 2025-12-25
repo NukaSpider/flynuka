@@ -1,6 +1,6 @@
 # Render Deployment Guide for FlyNuka
 
-This guide will help you deploy your FlyNuka portfolio site to Render.
+This guide will help you deploy your FlyNuka portfolio site to Render as a Web Service.
 
 ## Prerequisites
 
@@ -9,15 +9,15 @@ This guide will help you deploy your FlyNuka portfolio site to Render.
 
 ## Deployment Steps
 
-### 1. Create a New Static Site on Render
+### 1. Create a New Web Service on Render
 
 1. **Log in to Render**
    - Go to https://dashboard.render.com
    - Sign in or create an account
 
-2. **Create New Static Site**
+2. **Create New Web Service**
    - Click "New +" button
-   - Select "Static Site"
+   - Select "Web Service"
 
 3. **Connect Repository**
    - Choose "Connect GitHub" or "Connect GitLab"
@@ -34,6 +34,16 @@ Use these exact settings:
 flynuka
 ```
 
+**Environment:**
+```
+Node
+```
+
+**Region:**
+```
+(Choose closest to your users)
+```
+
 **Branch:**
 ```
 main
@@ -46,34 +56,33 @@ main
 
 **Build Command:**
 ```
-npm run generate-env
+npm install && npm run build
 ```
 
-*This will read environment variables from Render and inject them into config.js*
+*This installs dependencies and runs the build script which injects environment variables into config.js*
 
-**Publish Directory:**
+**Start Command:**
 ```
-(leave empty - static files are in root)
-```
-
-**Environment:**
-```
-Static Site
+npm start
 ```
 
-### 3. Environment Variables (Optional for Static Site)
+*This starts the Express server*
 
-Since this is a static site, you have two options:
+### 3. Environment Variables
 
-**Using Render Environment Variables (Recommended)**
-- Add environment variables in Render dashboard:
-  - `EMAILJS_SERVICE_ID`
-  - `EMAILJS_TEMPLATE_ID`
-  - `EMAILJS_PUBLIC_KEY`
-  - `TURNSTILE_SITE_KEY`
-  - `TURNSTILE_SECRET_KEY`
-- The build command (`npm run generate-env`) will automatically read these from `process.env` and inject them into `config.js`
-- No `.env` file needed - Render provides environment variables directly
+**Add these in Render Dashboard → Environment:**
+
+- `EMAILJS_SERVICE_ID` - Your EmailJS Service ID
+- `EMAILJS_TEMPLATE_ID` - Your EmailJS Template ID
+- `EMAILJS_PUBLIC_KEY` - Your EmailJS Public Key
+- `TURNSTILE_SITE_KEY` - Your Cloudflare Turnstile Site Key
+- `TURNSTILE_SECRET_KEY` - Your Cloudflare Turnstile Secret Key
+
+**How it works:**
+- During build, `npm run build` runs `npm run generate-env`
+- This reads environment variables from `process.env` (provided by Render)
+- Values are injected into `config.js`
+- The server then serves the updated `config.js` with your real API keys
 
 ### 4. Advanced Settings
 
@@ -87,14 +96,17 @@ Yes (automatically deploy on git push)
 Yes (optional, but recommended)
 ```
 
-**Headers:**
-Add these custom headers for security:
+**Instance Type:**
 ```
-X-Frame-Options: DENY
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 1; mode=block
-Referrer-Policy: strict-origin-when-cross-origin
+Free (sufficient for portfolio site)
 ```
+
+**Health Check Path:**
+```
+/ (or leave empty)
+```
+
+**Note:** The Express server automatically sets security headers via the meta tags in `index.html`. For additional headers, you can add middleware to `server.js`.
 
 ### 5. Deploy
 
@@ -111,6 +123,8 @@ After deployment, you'll get a URL like:
 ```
 https://flynuka.onrender.com
 ```
+
+**Note:** Free tier services may spin down after inactivity. First request after spin-down may take 30-60 seconds to respond.
 
 ## Cloudflare Configuration (After Nameservers Update)
 
@@ -154,14 +168,15 @@ If you prefer to keep environment variables out of Render:
 ## Recommended Render Settings Summary
 
 ```
-Service Type: Static Site
+Service Type: Web Service
 Name: flynuka
 Repository: NukaSpider/flynuka
 Branch: main
 Root Directory: (empty)
-Build Command: npm run generate-env || echo "Skipping"
-Publish Directory: (empty)
-Environment: Static Site
+Environment: Node
+Build Command: npm install && npm run build
+Start Command: npm start
+Instance Type: Free
 Auto-Deploy: Yes
 ```
 

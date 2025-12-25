@@ -5,9 +5,9 @@
 services:
   - type: web
     name: flynuka
-    env: static
-    buildCommand: npm run generate-env || echo "Skipping env generation"
-    staticPublishPath: .
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
     envVars:
       - key: EMAILJS_SERVICE_ID
         sync: false

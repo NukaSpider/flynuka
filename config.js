@@ -205,9 +205,9 @@ const siteConfig = {
   // Get these values from https://dashboard.emailjs.com/
   // Values are injected from .env file when you run: node config.js
   emailjs: {
-    serviceId: "service_yu1fcbi",
-    templateId: "template_6lbas8s",
-    publicKey: "JhDUSfAjpAQMBdV1n"
+    serviceId: "YOUR_SERVICE_ID",
+    templateId: "YOUR_TEMPLATE_ID",
+    publicKey: "YOUR_PUBLIC_KEY"
   },
   
   // Cloudflare Turnstile Configuration

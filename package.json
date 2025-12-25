@@ -2,11 +2,20 @@
   "name": "flynuka",
   "version": "1.0.0",
   "description": "Drone Photography and Videography Portfolio Website",
+  "main": "server.js",
   "scripts": {
-    "generate-env": "node config.js"
+    "generate-env": "node config.js",
+    "start": "node server.js",
+    "build": "npm run generate-env"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
 }
 
