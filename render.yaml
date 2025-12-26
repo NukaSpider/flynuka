@@ -1,0 +1,22 @@
+# Render Blueprint for FlyNuka
+# This file can be used to deploy via Render's Blueprint feature
+# Or use the manual setup described in RENDER_DEPLOYMENT.md
+
+services:
+  - type: web
+    name: flynuka
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: EMAILJS_SERVICE_ID
+        sync: false
+      - key: EMAILJS_TEMPLATE_ID
+        sync: false
+      - key: EMAILJS_PUBLIC_KEY
+        sync: false
+      - key: TURNSTILE_SITE_KEY
+        sync: false
+      - key: TURNSTILE_SECRET_KEY
+        sync: false
+

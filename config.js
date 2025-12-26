@@ -1,0 +1,252 @@
+#!/usr/bin/env node
+/**
+ * This file serves dual purposes:
+ * 1. When run with Node.js: Injects values from .env file into this config file
+ * 2. When loaded in browser: Provides site configuration
+ * 
+ * To update config with .env values: node config.js
+ */
+
+// Node.js execution: Inject environment variable values into config.js
+// Works with both .env file (local) and process.env (Render/CI)
+if (typeof window === 'undefined' && typeof require !== 'undefined') {
+  const fs = require('fs');
+  const path = require('path');
+  
+  const envPath = path.join(__dirname, '.env');
+  const configPath = path.join(__dirname, 'config.js');
+  
+  // Get environment variables from process.env (Render) or .env file (local)
+  const envVars = {};
+  
+  // First, try to read from process.env (Render environment variables)
+  if (process.env.EMAILJS_SERVICE_ID) {
+    envVars.EMAILJS_SERVICE_ID = process.env.EMAILJS_SERVICE_ID;
+    envVars.EMAILJS_TEMPLATE_ID = process.env.EMAILJS_TEMPLATE_ID;
+    envVars.EMAILJS_PUBLIC_KEY = process.env.EMAILJS_PUBLIC_KEY;
+    envVars.TURNSTILE_SITE_KEY = process.env.TURNSTILE_SITE_KEY;
+    envVars.TURNSTILE_SECRET_KEY = process.env.TURNSTILE_SECRET_KEY;
+    console.log('Using environment variables from process.env (Render/CI)');
+  } 
+  // Fallback to .env file if it exists (local development)
+  else if (fs.existsSync(envPath)) {
+    const envContent = fs.readFileSync(envPath, 'utf8');
+    
+    // Parse .env file
+    envContent.split('\n').forEach(line => {
+      line = line.trim();
+      if (!line || line.startsWith('#')) return;
+      const match = line.match(/^([^=]+)=(.*)$/);
+      if (match) {
+        envVars[match[1].trim()] = match[2].trim();
+      }
+    });
+    console.log('Using environment variables from .env file (local)');
+  } 
+  // No environment variables found
+  else {
+    console.warn('No environment variables found. Using placeholder values.');
+    console.warn('For local development: Create a .env file');
+    console.warn('For Render: Add environment variables in Render dashboard');
+    // Continue with placeholders - don't exit
+  }
+  
+  // Read config.js
+  let configContent = fs.readFileSync(configPath, 'utf8');
+  
+  // Replace placeholder values with actual values from environment
+  const replacements = [
+    { placeholder: 'YOUR_SERVICE_ID', value: envVars.EMAILJS_SERVICE_ID || 'YOUR_SERVICE_ID' },
+    { placeholder: 'YOUR_TEMPLATE_ID', value: envVars.EMAILJS_TEMPLATE_ID || 'YOUR_TEMPLATE_ID' },
+    { placeholder: 'YOUR_PUBLIC_KEY', value: envVars.EMAILJS_PUBLIC_KEY || 'YOUR_PUBLIC_KEY' },
+    { placeholder: 'YOUR_TURNSTILE_SITE_KEY', value: envVars.TURNSTILE_SITE_KEY || 'YOUR_TURNSTILE_SITE_KEY' },
+    { placeholder: 'YOUR_TURNSTILE_SECRET_KEY', value: envVars.TURNSTILE_SECRET_KEY || 'YOUR_TURNSTILE_SECRET_KEY' },
+    { placeholder: 'YOUR_SHORTIO_API_KEY', value: envVars.SHORTIO_API_KEY || 'YOUR_SHORTIO_API_KEY' }
+  ];
+  
+  replacements.forEach(({ placeholder, value }) => {
+    // Escape special regex characters
+    const escapedPlaceholder = placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // Replace in emailjs section
+    configContent = configContent.replace(
+      new RegExp(`(serviceId|templateId|publicKey):\\s*"${escapedPlaceholder}"`, 'g'),
+      (match, key) => `${key}: "${value}"`
+    );
+    // Replace in turnstile section
+    configContent = configContent.replace(
+      new RegExp(`(siteKey|secretKey):\\s*"${escapedPlaceholder}"`, 'g'),
+      (match, key) => `${key}: "${value}"`
+    );
+    // Replace in shortio section
+    configContent = configContent.replace(
+      new RegExp(`(apiKey):\\s*"${escapedPlaceholder}"`, 'g'),
+      (match, key) => `${key}: "${value}"`
+    );
+  });
+  
+  // Write the updated config.js
+  fs.writeFileSync(configPath, configContent, 'utf8');
+  console.log('✓ Updated config.js with environment variable values');
+  process.exit(0);
+}
+
+// Browser execution: Site configuration
+// Site configuration
+const siteConfig = {
+  // Personal Information
+  name: "Joseph Duguay",
+  title: "Remote Pilot",
+  tagline: "Drone Photography and Videography",
+  phone: "+1 (719) 666-1812",
+  email: "contact@flynuka.com",
+  
+  // Personal Information (for hybrid personal/business site)
+  personal: {
+    intro: "Hey, I'm Joseph! When I'm not flying drones professionally, you'll find me exploring the great outdoors, capturing moments that inspire me, or tinkering with the latest tech. I believe the best work comes from passion, and my passion is showing the world from a perspective most never get to see.",
+    interests: [
+      "Outdoor Adventure & Hiking",
+      "Photography & Cinematography",
+      "Technology & Innovation",
+      "Travel & Exploration"
+    ],
+    funFacts: [
+      "I've flown drones in over 20 different states",
+      "My favorite time to shoot is during golden hour",
+      "I'm always learning new aerial techniques"
+    ]
+  },
+  
+  // Social Links (add or remove as needed)
+  socialLinks: {
+    instagram: {
+      handle: "@flynuka",
+      url: "https://instagram.com/flynuka",
+      icon: "fab fa-instagram"
+    },
+    // Add more social links here:
+    // twitter: {
+    //   handle: "@flynuka",
+    //   url: "https://twitter.com/flynuka",
+    //   icon: "fab fa-twitter"
+    // },
+    // linkedin: {
+    //   handle: "Joseph Duguay",
+    //   url: "https://linkedin.com/in/josephduguay",
+    //   icon: "fab fa-linkedin"
+    // },
+    // youtube: {
+    //   handle: "Flynuka",
+    //   url: "https://youtube.com/@flynuka",
+    //   icon: "fab fa-youtube"
+    // }
+  },
+  
+  // Portfolio Images (use placeholder URLs for now)
+  portfolio: [
+    {
+      id: 1,
+      title: "Aerial Landscape",
+      category: "Photography",
+      image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop",
+      description: "Stunning aerial view of natural landscapes"
+    },
+    {
+      id: 2,
+      title: "Urban Architecture",
+      category: "Photography",
+      image: "https://images.unsplash.com/photo-1514565131-fce0801e5785?w=800&h=600&fit=crop",
+      description: "Modern cityscapes from above"
+    },
+    {
+      id: 3,
+      title: "Event Coverage",
+      category: "Videography",
+      image: "https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&h=600&fit=crop",
+      description: "Dynamic event videography"
+    },
+    {
+      id: 4,
+      title: "Real Estate",
+      category: "Photography",
+      image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=600&fit=crop",
+      description: "Professional property photography"
+    },
+    {
+      id: 5,
+      title: "Commercial Video",
+      category: "Videography",
+      image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&h=600&fit=crop",
+      description: "High-quality commercial content"
+    },
+    {
+      id: 6,
+      title: "Nature Documentary",
+      category: "Videography",
+      image: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=600&fit=crop",
+      description: "Cinematic nature footage"
+    }
+  ],
+  
+  // Services
+  services: [
+    {
+      title: "Aerial Photography",
+      description: "Stunning high-resolution aerial images for real estate, events, and commercial use.",
+      icon: "fas fa-camera"
+    },
+    {
+      title: "Drone Videography",
+      description: "Cinematic video production with smooth, professional aerial footage.",
+      icon: "fas fa-video"
+    },
+    {
+      title: "Real Estate",
+      description: "Property showcases that highlight unique features and surrounding areas.",
+      icon: "fas fa-home"
+    },
+    {
+      title: "Event Coverage",
+      description: "Capture your special moments from unique aerial perspectives.",
+      icon: "fas fa-calendar-alt"
+    }
+  ],
+  
+  // About Section
+  about: {
+    headline: "Elevating Perspectives Through Aerial Excellence",
+    description: "With years of experience as a certified remote pilot, I specialize in capturing breathtaking aerial imagery and cinematic footage. From commercial projects to personal events, I bring a unique perspective to every assignment. When I'm not behind the controls, I'm exploring new locations, experimenting with creative techniques, and always pushing the boundaries of what's possible from above.",
+    highlights: [
+      "FAA Certified Remote Pilot",
+      "Professional Grade Equipment",
+      "Creative Vision & Technical Expertise",
+      "Fully Insured & Licensed"
+    ],
+    personalNote: "This isn't just a job for me—it's a passion. Every flight is an opportunity to see the world differently and share that perspective with others. Whether it's a commercial project or a personal adventure, I approach each flight with the same enthusiasm and attention to detail."
+  },
+  
+  // EmailJS Configuration
+  // Get these values from https://dashboard.emailjs.com/
+  // Values are injected from .env file when you run: node config.js
+  emailjs: {
+    serviceId: "service_yu1fcbi",
+    templateId: "template_6lbas8s",
+    publicKey: "JhDUSfAjpAQMBdV1n"
+  },
+  
+  // Cloudflare Turnstile Configuration
+  // Get these values from https://dash.cloudflare.com/
+  // Values are injected from .env file when you run: node config.js
+  turnstile: {
+    siteKey: "YOUR_TURNSTILE_SITE_KEY",
+    secretKey: "YOUR_TURNSTILE_SECRET_KEY" // Keep private - for server-side verification
+  },
+  
+  // Short.io Configuration
+  // Get API key from https://app.short.io/
+  // Values are injected from .env file when you run: node config.js
+  shortio: {
+    apiKey: "YOUR_SHORTIO_API_KEY",
+    domain: "go.flynuka.com"
+  }
+};
+

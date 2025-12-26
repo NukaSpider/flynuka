@@ -1,0 +1,763 @@
+// ===== DOM Elements =====
+const navbar = document.getElementById('navbar');
+const hamburger = document.getElementById('hamburger');
+const navMenu = document.getElementById('navMenu');
+const navLinks = document.querySelectorAll('.nav-link');
+const portfolioGrid = document.getElementById('portfolioGrid');
+const servicesGrid = document.getElementById('servicesGrid');
+const portfolioModal = document.getElementById('portfolioModal');
+const modalClose = document.getElementById('modalClose');
+const contactForm = document.getElementById('contactForm');
+const filterButtons = document.querySelectorAll('.filter-btn');
+const themeToggle = document.getElementById('themeToggle');
+const themeIcon = document.getElementById('themeIcon');
+
+// Turnstile state
+let turnstileWidgetId = null;
+let turnstileToken = null;
+
+// Rate limiting - prevent spam submissions
+let lastSubmissionTime = 0;
+const MIN_SUBMISSION_INTERVAL = 10000; // 10 seconds between submissions
+let submissionAttempts = 0;
+const MAX_SUBMISSION_ATTEMPTS = 5;
+const RATE_LIMIT_RESET_TIME = 60000; // Reset after 1 minute
+
+// ===== Initialize =====
+document.addEventListener('DOMContentLoaded', () => {
+    initializeTheme();
+    initializeSite();
+    setupEventListeners();
+    setupScrollAnimations();
+    setupIntersectionObserver();
+    initializeTurnstile();
+});
+
+// ===== Initialize Site Content =====
+function initializeSite() {
+    // Set hero subtitle
+    const heroSubtitle = document.getElementById('heroSubtitle');
+    if (heroSubtitle) {
+        heroSubtitle.textContent = `${siteConfig.name} • ${siteConfig.title}`;
+    }
+    
+    // Update Turnstile widget with site key
+    const turnstileWidget = document.getElementById('turnstile-widget');
+    if (turnstileWidget && siteConfig.turnstile.siteKey && siteConfig.turnstile.siteKey !== 'YOUR_TURNSTILE_SITE_KEY') {
+        turnstileWidget.setAttribute('data-sitekey', siteConfig.turnstile.siteKey);
+    }
+
+    // Set about section
+    const aboutTitle = document.getElementById('aboutTitle');
+    const aboutDescription = document.getElementById('aboutDescription');
+    const aboutName = document.getElementById('aboutName');
+    const aboutTitleText = document.getElementById('aboutTitleText');
+    const aboutHighlights = document.getElementById('aboutHighlights');
+
+    if (aboutTitle) aboutTitle.textContent = siteConfig.about.headline;
+    if (aboutDescription) aboutDescription.textContent = siteConfig.about.description;
+    if (aboutName) aboutName.textContent = siteConfig.name;
+    if (aboutTitleText) aboutTitleText.textContent = siteConfig.title;
+    
+    if (aboutHighlights) {
+        aboutHighlights.innerHTML = siteConfig.about.highlights.map(highlight => `
+            <div class="highlight-item">
+                <i class="fas fa-check-circle"></i>
+                <h4>${highlight}</h4>
+            </div>
+        `).join('');
+    }
+
+    // Set personal section
+    const personalIntro = document.getElementById('personalIntro');
+    const personalInterests = document.getElementById('personalInterests');
+    
+    if (personalIntro && siteConfig.personal && siteConfig.personal.intro) {
+        personalIntro.textContent = siteConfig.personal.intro;
+    }
+    
+    if (personalInterests && siteConfig.personal && siteConfig.personal.interests) {
+        personalInterests.innerHTML = `
+            <h4 style="margin-bottom: 0.75rem; color: var(--text-primary); font-size: 1.05rem;">
+                <i class="fas fa-heart" style="color: var(--primary-green); margin-right: 0.5rem;"></i>
+                What I'm Into
+            </h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.6rem;">
+                ${siteConfig.personal.interests.map(interest => `
+                    <span style="display: inline-block; padding: 0.4rem 0.9rem; background: var(--bg-secondary); border-radius: 20px; font-size: 0.9rem; color: var(--text-secondary); border: 1px solid var(--border-color);">
+                        ${interest}
+                    </span>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    // Render services
+    renderServices();
+
+    // Render portfolio
+    renderPortfolio();
+
+    // Set contact info
+    const contactPhone = document.getElementById('contactPhone');
+    const contactEmail = document.getElementById('contactEmail');
+    if (contactPhone) contactPhone.textContent = siteConfig.phone;
+    if (contactEmail) contactEmail.textContent = siteConfig.email;
+
+    // Render social links
+    renderSocialLinks();
+
+    // Set current year
+    const currentYear = document.getElementById('currentYear');
+    if (currentYear) currentYear.textContent = new Date().getFullYear();
+
+    // Initialize fun facts rotation
+    initializeFunFacts();
+}
+
+// ===== Render Services =====
+function renderServices() {
+    if (!servicesGrid) return;
+    
+    servicesGrid.innerHTML = siteConfig.services.map(service => `
+        <div class="service-card fade-in">
+            <div class="service-icon">
+                <i class="${service.icon}"></i>
+            </div>
+            <h3>${service.title}</h3>
+            <p>${service.description}</p>
+        </div>
+    `).join('');
+}
+
+// ===== Render Portfolio =====
+function renderPortfolio(filter = 'all') {
+    if (!portfolioGrid) return;
+
+    const filteredItems = filter === 'all' 
+        ? siteConfig.portfolio 
+        : siteConfig.portfolio.filter(item => item.category === filter);
+
+    portfolioGrid.innerHTML = filteredItems.map(item => `
+        <div class="portfolio-item fade-in" data-category="${item.category}" data-id="${item.id}">
+            <img src="${item.image}" alt="${item.title}" loading="lazy">
+            <div class="portfolio-overlay">
+                <h3>${item.title}</h3>
+                <p>${item.category}</p>
+            </div>
+        </div>
+    `).join('');
+
+    // Add click listeners to portfolio items
+    const portfolioItems = document.querySelectorAll('.portfolio-item');
+    portfolioItems.forEach(item => {
+        item.addEventListener('click', () => openPortfolioModal(item.dataset.id));
+    });
+
+    // Re-trigger intersection observer for new items
+    setTimeout(() => {
+        setupIntersectionObserver();
+    }, 100);
+}
+
+// ===== Render Social Links =====
+function renderSocialLinks() {
+    const socialLinksContainer = document.getElementById('socialLinks');
+    if (!socialLinksContainer) return;
+
+    const socialLinks = Object.entries(siteConfig.socialLinks);
+    if (socialLinks.length === 0) return;
+
+    socialLinksContainer.innerHTML = socialLinks.map(([key, value]) => `
+        <a href="${value.url}" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="${key}">
+            <i class="${value.icon}"></i>
+        </a>
+    `).join('');
+}
+
+// ===== Theme Management =====
+function initializeTheme() {
+    // Check for saved theme preference or default to light mode
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    setTheme(savedTheme);
+}
+
+function setTheme(theme) {
+    const html = document.documentElement;
+    
+    if (theme === 'dark') {
+        html.setAttribute('data-theme', 'dark');
+        if (themeIcon) {
+            themeIcon.className = 'fas fa-sun';
+        }
+        if (themeToggle) {
+            themeToggle.classList.add('active');
+        }
+        localStorage.setItem('theme', 'dark');
+    } else {
+        html.setAttribute('data-theme', 'light');
+        if (themeIcon) {
+            themeIcon.className = 'fas fa-moon';
+        }
+        if (themeToggle) {
+            themeToggle.classList.remove('active');
+        }
+        localStorage.setItem('theme', 'light');
+    }
+}
+
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+}
+
+// ===== Event Listeners =====
+function setupEventListeners() {
+    // Theme toggle
+    if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
+    }
+    
+    // Navbar scroll effect
+    window.addEventListener('scroll', handleNavbarScroll);
+
+    // Mobile menu toggle
+    if (hamburger) {
+        hamburger.addEventListener('click', toggleMobileMenu);
+    }
+
+    // Close mobile menu when clicking nav links
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            if (navMenu.classList.contains('active')) {
+                toggleMobileMenu();
+            }
+        });
+    });
+
+    // Portfolio filter buttons
+    filterButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const filter = btn.dataset.filter;
+            
+            // Update active state
+            filterButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // Filter portfolio
+            renderPortfolio(filter);
+        });
+    });
+
+    // Modal close
+    if (modalClose) {
+        modalClose.addEventListener('click', closePortfolioModal);
+    }
+
+    if (portfolioModal) {
+        portfolioModal.addEventListener('click', (e) => {
+            if (e.target === portfolioModal) {
+                closePortfolioModal();
+            }
+        });
+    }
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && portfolioModal.classList.contains('active')) {
+            closePortfolioModal();
+        }
+    });
+
+    // Contact form submission
+    if (contactForm) {
+        contactForm.addEventListener('submit', handleFormSubmit);
+    }
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                const offsetTop = target.offsetTop - 80;
+                window.scrollTo({
+                    top: offsetTop,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+}
+
+// ===== Navbar Scroll Effect =====
+function handleNavbarScroll() {
+    if (window.scrollY > 50) {
+        navbar.classList.add('scrolled');
+    } else {
+        navbar.classList.remove('scrolled');
+    }
+}
+
+// ===== Mobile Menu Toggle =====
+function toggleMobileMenu() {
+    hamburger.classList.toggle('active');
+    navMenu.classList.toggle('active');
+    document.body.style.overflow = navMenu.classList.contains('active') ? 'hidden' : '';
+}
+
+// ===== Portfolio Modal =====
+function openPortfolioModal(itemId) {
+    const item = siteConfig.portfolio.find(p => p.id === parseInt(itemId));
+    if (!item) return;
+
+    const modalImage = document.getElementById('modalImage');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalCategory = document.getElementById('modalCategory');
+    const modalDescription = document.getElementById('modalDescription');
+
+    if (modalImage) modalImage.src = item.image;
+    if (modalImage) modalImage.alt = item.title;
+    if (modalTitle) modalTitle.textContent = item.title;
+    if (modalCategory) modalCategory.textContent = item.category;
+    if (modalDescription) modalDescription.textContent = item.description;
+
+    portfolioModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closePortfolioModal() {
+    portfolioModal.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// ===== Cloudflare Turnstile Functions =====
+function initializeTurnstile() {
+    // Check if Turnstile is configured
+    if (!siteConfig.turnstile.siteKey || siteConfig.turnstile.siteKey === 'YOUR_TURNSTILE_SITE_KEY') {
+        console.warn('Cloudflare Turnstile not configured. Please update config.js with your Turnstile Site Key.');
+        // Hide Turnstile widget if not configured
+        const turnstileContainer = document.querySelector('.turnstile-container');
+        if (turnstileContainer) {
+            turnstileContainer.style.display = 'none';
+        }
+        return;
+    }
+    
+    // Update Turnstile widget with site key
+    const turnstileWidget = document.getElementById('turnstile-widget');
+    if (turnstileWidget) {
+        turnstileWidget.setAttribute('data-sitekey', siteConfig.turnstile.siteKey);
+        
+        // Set theme based on current theme
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        turnstileWidget.setAttribute('data-theme', currentTheme === 'dark' ? 'dark' : 'light');
+    }
+    
+    // Wait for Turnstile to load, then render widget
+    if (typeof turnstile !== 'undefined') {
+        renderTurnstile();
+    } else {
+        // Wait for Turnstile script to load
+        window.addEventListener('load', () => {
+            if (typeof turnstile !== 'undefined') {
+                renderTurnstile();
+            }
+        });
+    }
+    
+    // Listen for theme changes to update Turnstile theme
+    const observer = new MutationObserver(() => {
+        if (turnstileWidgetId !== null && typeof turnstile !== 'undefined') {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            turnstile.remove(turnstileWidgetId);
+            renderTurnstile(currentTheme === 'dark' ? 'dark' : 'light');
+        }
+    });
+    
+    observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['data-theme']
+    });
+}
+
+function renderTurnstile(theme = null) {
+    const turnstileWidget = document.getElementById('turnstile-widget');
+    if (!turnstileWidget || typeof turnstile === 'undefined') return;
+    
+    const currentTheme = theme || (document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light');
+    
+    turnstileWidgetId = turnstile.render(turnstileWidget, {
+        sitekey: siteConfig.turnstile.siteKey,
+        theme: currentTheme,
+        size: 'normal',
+        callback: function(token) {
+            turnstileToken = token;
+            console.log('Turnstile verified successfully');
+        },
+        'error-callback': function() {
+            turnstileToken = null;
+            console.error('Turnstile verification failed');
+        },
+        'expired-callback': function() {
+            turnstileToken = null;
+            console.log('Turnstile token expired');
+        }
+    });
+}
+
+function resetTurnstile() {
+    if (turnstileWidgetId !== null && typeof turnstile !== 'undefined') {
+        turnstile.reset(turnstileWidgetId);
+        turnstileToken = null;
+    }
+}
+
+// ===== Input Sanitization =====
+function sanitizeInput(input) {
+    if (typeof input !== 'string') return '';
+    
+    // Remove potentially dangerous characters and scripts
+    return input
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // Remove script tags
+        .replace(/<[^>]+>/g, '') // Remove HTML tags
+        .replace(/javascript:/gi, '') // Remove javascript: protocol
+        .replace(/on\w+\s*=/gi, '') // Remove event handlers
+        .trim();
+}
+
+function validateEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+function validateName(name) {
+    // Allow letters, spaces, hyphens, apostrophes, and periods
+    const nameRegex = /^[A-Za-z\s\-'\.]{2,100}$/;
+    return nameRegex.test(name);
+}
+
+// ===== Form Submission =====
+function handleFormSubmit(e) {
+    e.preventDefault();
+    
+    // Rate limiting check
+    const currentTime = Date.now();
+    const timeSinceLastSubmission = currentTime - lastSubmissionTime;
+    
+    if (timeSinceLastSubmission < MIN_SUBMISSION_INTERVAL) {
+        const remainingTime = Math.ceil((MIN_SUBMISSION_INTERVAL - timeSinceLastSubmission) / 1000);
+        showFormMessage(`Please wait ${remainingTime} second${remainingTime > 1 ? 's' : ''} before submitting again.`, 'error');
+        return;
+    }
+    
+    // Check submission attempts
+    if (submissionAttempts >= MAX_SUBMISSION_ATTEMPTS) {
+        showFormMessage('Too many submission attempts. Please wait a minute before trying again.', 'error');
+        setTimeout(() => {
+            submissionAttempts = 0;
+        }, RATE_LIMIT_RESET_TIME);
+        return;
+    }
+    
+    // Honeypot check - if this field is filled, it's likely a bot
+    const honeypotField = document.getElementById('website');
+    if (honeypotField && honeypotField.value) {
+        console.warn('Bot detected: honeypot field was filled');
+        showFormMessage('Invalid submission detected.', 'error');
+        return;
+    }
+    
+    // Check if EmailJS is configured
+    if (!siteConfig.emailjs.serviceId || 
+        siteConfig.emailjs.serviceId === 'YOUR_SERVICE_ID' ||
+        !siteConfig.emailjs.templateId || 
+        siteConfig.emailjs.templateId === 'YOUR_TEMPLATE_ID' ||
+        !siteConfig.emailjs.publicKey || 
+        siteConfig.emailjs.publicKey === 'YOUR_PUBLIC_KEY') {
+        showFormMessage('Email service is not configured. Please check the setup instructions.', 'error');
+        console.error('EmailJS not configured. Please update config.js with your EmailJS credentials.');
+        return;
+    }
+    
+    // Get and sanitize form data
+    const rawFormData = {
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        subject: document.getElementById('subject').value,
+        message: document.getElementById('message').value
+    };
+    
+    const formData = {
+        name: sanitizeInput(rawFormData.name),
+        email: sanitizeInput(rawFormData.email).toLowerCase(),
+        subject: sanitizeInput(rawFormData.subject),
+        message: sanitizeInput(rawFormData.message)
+    };
+
+    // Validate form data
+    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+        showFormMessage('Please fill in all fields.', 'error');
+        submissionAttempts++;
+        return;
+    }
+    
+    // Validate email format
+    if (!validateEmail(formData.email)) {
+        showFormMessage('Please enter a valid email address.', 'error');
+        submissionAttempts++;
+        return;
+    }
+    
+    // Validate name format
+    if (!validateName(formData.name)) {
+        showFormMessage('Please enter a valid name (2-100 characters, letters, spaces, hyphens, apostrophes, and periods only).', 'error');
+        submissionAttempts++;
+        return;
+    }
+    
+    // Validate length limits
+    if (formData.name.length > 100) {
+        showFormMessage('Name is too long (maximum 100 characters).', 'error');
+        submissionAttempts++;
+        return;
+    }
+    
+    if (formData.email.length > 254) {
+        showFormMessage('Email is too long (maximum 254 characters).', 'error');
+        submissionAttempts++;
+        return;
+    }
+    
+    if (formData.subject.length > 200) {
+        showFormMessage('Subject is too long (maximum 200 characters).', 'error');
+        submissionAttempts++;
+        return;
+    }
+    
+    if (formData.message.length > 2000) {
+        showFormMessage('Message is too long (maximum 2000 characters).', 'error');
+        submissionAttempts++;
+        return;
+    }
+    
+    if (formData.message.length < 10) {
+        showFormMessage('Message is too short (minimum 10 characters).', 'error');
+        submissionAttempts++;
+        return;
+    }
+
+    // Check if Turnstile is configured and verify token
+    if (siteConfig.turnstile.siteKey && siteConfig.turnstile.siteKey !== 'YOUR_TURNSTILE_SITE_KEY') {
+        if (!turnstileToken) {
+            showFormMessage('Please complete the security verification.', 'error');
+            submissionAttempts++;
+            return;
+        }
+    }
+    
+    // Update rate limiting
+    lastSubmissionTime = currentTime;
+    submissionAttempts++;
+    
+    // Show loading state
+    const submitButton = contactForm.querySelector('button[type="submit"]');
+    const originalButtonText = submitButton.textContent;
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+    
+    // Initialize EmailJS (only needed once, but safe to call multiple times)
+    if (typeof emailjs !== 'undefined') {
+        emailjs.init(siteConfig.emailjs.publicKey);
+    }
+
+    // Prepare template parameters (include Turnstile token for server-side verification if needed)
+    const templateParams = {
+        from_name: formData.name,
+        from_email: formData.email,
+        subject: formData.subject,
+        message: formData.message,
+        to_email: siteConfig.email, // Your email address
+        reply_to: formData.email,
+        turnstile_token: turnstileToken || '' // Include token for verification
+    };
+
+    // Send email using EmailJS
+    emailjs.send(
+        siteConfig.emailjs.serviceId,
+        siteConfig.emailjs.templateId,
+        templateParams
+    )
+    .then((response) => {
+        console.log('Email sent successfully!', response.status, response.text);
+        showFormMessage('Thank you! Your message has been sent. I\'ll get back to you soon.', 'success');
+        contactForm.reset();
+        
+        // Reset Turnstile
+        resetTurnstile();
+        
+        // Reset rate limiting on successful submission
+        submissionAttempts = 0;
+        
+        // Reset button state
+        submitButton.disabled = false;
+        submitButton.innerHTML = originalButtonText;
+    })
+    .catch((error) => {
+        console.error('Email sending failed:', error);
+        showFormMessage('Sorry, there was an error sending your message. Please try again or contact me directly at ' + siteConfig.email, 'error');
+        
+        // Reset button state
+        submitButton.disabled = false;
+        submitButton.innerHTML = originalButtonText;
+    });
+}
+
+function showFormMessage(message, type) {
+    // Remove existing message if any
+    const existingMessage = document.querySelector('.form-message');
+    if (existingMessage) {
+        existingMessage.remove();
+    }
+
+    // Create message element
+    const messageEl = document.createElement('div');
+    messageEl.className = `form-message ${type}`;
+    
+    // Add icon based on type
+    const icon = type === 'success' ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-exclamation-circle"></i>';
+    messageEl.innerHTML = `${icon} ${message}`;
+
+    contactForm.appendChild(messageEl);
+
+    // Scroll to message if it's not visible
+    messageEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    // Remove message after 7 seconds (longer for error messages)
+    const duration = type === 'error' ? 10000 : 7000;
+    setTimeout(() => {
+        messageEl.style.animation = 'fadeOut 0.5s ease-out';
+        setTimeout(() => messageEl.remove(), 500);
+    }, duration);
+}
+
+// ===== Fun Facts Rotation =====
+let currentFunFactIndex = 0;
+let funFactInterval = null;
+
+function initializeFunFacts() {
+    const funFactContainer = document.getElementById('funFactsContainer');
+    const funFactText = document.getElementById('funFactText');
+    const funFactElement = document.getElementById('funFact');
+    
+    if (!funFactContainer || !funFactText || !siteConfig.personal || !siteConfig.personal.funFacts || siteConfig.personal.funFacts.length === 0) {
+        // Hide container if no fun facts
+        if (funFactContainer) {
+            funFactContainer.style.display = 'none';
+        }
+        return;
+    }
+    
+    const funFacts = siteConfig.personal.funFacts;
+    
+    // Display first fun fact
+    funFactText.textContent = funFacts[0];
+    funFactElement.classList.add('fade-in');
+    
+    // Rotate fun facts every 4 seconds
+    funFactInterval = setInterval(() => {
+        // Fade out
+        funFactElement.classList.remove('fade-in');
+        funFactElement.classList.add('fade-out');
+        
+        setTimeout(() => {
+            // Move to next fact
+            currentFunFactIndex = (currentFunFactIndex + 1) % funFacts.length;
+            funFactText.textContent = funFacts[currentFunFactIndex];
+            
+            // Fade in
+            funFactElement.classList.remove('fade-out');
+            funFactElement.classList.add('fade-in');
+        }, 500); // Wait for fade out to complete
+    }, 4000); // Change every 4 seconds
+}
+
+// ===== Scroll Animations =====
+function setupScrollAnimations() {
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, observerOptions);
+
+    // Observe all fade-in elements
+    document.querySelectorAll('.fade-in').forEach(el => {
+        observer.observe(el);
+    });
+}
+
+// ===== Intersection Observer for Section Animations =====
+function setupIntersectionObserver() {
+    const sections = document.querySelectorAll('section');
+    
+    const observerOptions = {
+        threshold: 0.15,
+        rootMargin: '0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('section-visible');
+                
+                // Animate child elements with stagger
+                const animatedChildren = entry.target.querySelectorAll('.fade-in');
+                animatedChildren.forEach((child, index) => {
+                    setTimeout(() => {
+                        child.classList.add('visible');
+                    }, index * 100);
+                });
+            }
+        });
+    }, observerOptions);
+
+    sections.forEach(section => {
+        observer.observe(section);
+    });
+}
+
+// ===== Parallax Effect for Hero =====
+window.addEventListener('scroll', () => {
+    const scrolled = window.pageYOffset;
+    const heroShapes = document.querySelectorAll('.hero-shape');
+    
+    heroShapes.forEach((shape, index) => {
+        const speed = 0.5 + (index * 0.2);
+        shape.style.transform = `translateY(${scrolled * speed}px)`;
+    });
+});
+
+// ===== Add CSS for fadeOut animation =====
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeOut {
+        from {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+    }
+`;
+document.head.appendChild(style);
+
