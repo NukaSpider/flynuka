@@ -1,0 +1,66 @@
+.App {
+  min-height: 100vh;
+  position: relative;
+}
+
+main {
+  position: relative;
+}
+
+/* Smooth section transitions */
+section {
+  padding: 100px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+}
+
+@media (max-width: 768px) {
+  section {
+    padding: 60px 20px;
+  }
+}
+
+/* Gradient backgrounds */
+.gradient-bg {
+  background: linear-gradient(
+    135deg,
+    var(--bg-primary) 0%,
+    var(--bg-secondary) 100%
+  );
+}
+
+/* Glow effects */
+.glow-effect {
+  box-shadow: 0 0 20px var(--lime-green-glow),
+              0 0 40px var(--lime-green-glow),
+              0 0 60px var(--lime-green-glow);
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.float-animation {
+  animation: float 6s ease-in-out infinite;
+}
+
+.pulse-animation {
+  animation: pulse 2s ease-in-out infinite;
+}
+

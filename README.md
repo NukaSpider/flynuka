@@ -1,71 +1,75 @@
 # FlyNuka Website
 
-A modern, responsive single-page website for FlyNuka - Drone Photography and Videography services.
+A modern, responsive personal/business hybrid website built with React and Vite.
 
 ## Features
 
-- Modern, clean design with smooth animations
-- Fully responsive (mobile, tablet, desktop)
-- Font Awesome icons throughout
-- Cloudflare Turnstile integration for form security
-- Ready for Render Web Service deployment
+- 🎨 Modern UI with lime green theme
+- 🌓 Dark/Light mode toggle
+- ✨ Smooth animations with Framer Motion
+- 📱 Fully responsive design
+- 📧 Contact form with EmailJS integration
+- 🔒 Cloudflare Turnstile captcha
+- 🚀 Optimized for Render deployment
 
-## Local Development
+## Setup
 
 1. Install dependencies:
 ```bash
 npm install
 ```
 
-2. Start the development server:
-```bash
-npm start
+2. Create a `.env` file in the root directory with the following variables:
+```env
+VITE_EMAILJS_SERVICE_ID=your_emailjs_service_id
+VITE_EMAILJS_TEMPLATE_ID=your_emailjs_template_id
+VITE_EMAILJS_PUBLIC_KEY=your_emailjs_public_key
+VITE_CLOUDFLARE_SITE_KEY=your_cloudflare_site_key
 ```
 
-The site will be available at `http://localhost:3000`
+   You can copy `.env.example` as a template if it exists.
 
-## Deployment to Render
+3. Start the development server:
+```bash
+npm run dev
+```
 
-This site is configured for Render Web Service deployment.
+4. Build for production:
+```bash
+npm run build
+```
 
-### Option 1: Using render.yaml (Recommended)
+5. Preview production build locally:
+```bash
+npm run preview
+```
+
+## Deployment on Render
 
 1. Connect your repository to Render
-2. Render will automatically detect the `render.yaml` file and configure the service
-
-### Option 2: Manual Configuration
-
-1. Create a new Web Service on Render
-2. Connect your repository
-3. Configure:
-   - **Build Command**: `npm install`
-   - **Start Command**: `npm start`
-   - **Environment**: Node
-
-### Environment Variables
-
-Make sure to set your Cloudflare Turnstile keys in Render's environment variables:
-- `CLOUDFLARE_SITE_KEY` (already in your .env)
-- `CLOUDFLARE_SECRET_KEY` (already in your .env)
+2. Create a new Web Service
+3. Set the build command: `npm install && npm run build`
+4. Set the start command: `npm run start`
+5. Add your environment variables in the Render dashboard
+6. Deploy!
 
 ## Project Structure
 
 ```
-├── index.html      # Main HTML file
-├── styles.css      # All styles and animations
-├── script.js       # JavaScript functionality
-├── server.js       # Express server for Render
-├── package.json    # Dependencies and scripts
-├── render.yaml     # Render deployment configuration
-└── .env           # Environment variables (not committed)
+src/
+  ├── components/     # React components
+  ├── App.jsx        # Main app component
+  ├── App.css        # App styles
+  ├── main.jsx       # Entry point
+  └── index.css      # Global styles
 ```
 
-## Technologies Used
+## Technologies
 
-- HTML5
-- CSS3 (with animations and transitions)
-- Vanilla JavaScript (ES6+)
-- Express.js (for Render deployment)
-- Font Awesome 6.5.1
+- React 18
+- Vite
+- Framer Motion
+- EmailJS
+- Font Awesome
 - Cloudflare Turnstile
 

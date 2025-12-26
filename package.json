@@ -1,22 +1,29 @@
 {
   "name": "flynuka-website",
   "version": "1.0.0",
-  "description": "Personal/Business website for FlyNuka - Drone Photography and Videography",
-  "main": "server.js",
+  "description": "Personal/Business hybrid website",
+  "private": true,
+  "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 3000",
+    "start": "node server.js"
   },
-  "keywords": [
-    "drone",
-    "photography",
-    "videography",
-    "portfolio"
-  ],
-  "author": "Joseph Duguay",
-  "license": "MIT",
   "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "@emailjs/browser": "^3.11.0",
+    "framer-motion": "^10.16.4",
     "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
+    "@vitejs/plugin-react": "^4.2.0",
+    "vite": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
-
