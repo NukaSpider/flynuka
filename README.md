@@ -1,32 +1,16 @@
 # FlyNuka Website
 
-A modern, responsive website for FlyNuka - Drone Photography & Videography services.
+A modern, responsive single-page website for FlyNuka - Drone Photography and Videography services.
 
 ## Features
 
-- 🎨 Modern, clean design themed around the brand's bright green color scheme
-- 📱 Fully responsive design that works on all devices
-- ✨ Smooth animations powered by Framer Motion
-- 🧩 Modular component structure for easy expansion
-- ⚡ Fast and optimized with Vite
-- 🎯 SEO-friendly structure
+- Modern, clean design with smooth animations
+- Fully responsive (mobile, tablet, desktop)
+- Font Awesome icons throughout
+- Cloudflare Turnstile integration for form security
+- Ready for Render Web Service deployment
 
-## Tech Stack
-
-- **React 18** - UI library
-- **Vite** - Build tool and dev server
-- **Tailwind CSS** - Utility-first CSS framework
-- **Framer Motion** - Animation library
-- **React Icons** - Icon library
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js (v16 or higher)
-- npm or yarn
-
-### Installation
+## Local Development
 
 1. Install dependencies:
 ```bash
@@ -35,66 +19,53 @@ npm install
 
 2. Start the development server:
 ```bash
-npm run dev
+npm start
 ```
 
-3. Open your browser and navigate to `http://localhost:5173`
+The site will be available at `http://localhost:3000`
 
-### Build for Production
+## Deployment to Render
 
-```bash
-npm run build
-```
+This site is configured for Render Web Service deployment.
 
-The built files will be in the `dist` directory.
+### Option 1: Using render.yaml (Recommended)
 
-### Preview Production Build
+1. Connect your repository to Render
+2. Render will automatically detect the `render.yaml` file and configure the service
 
-```bash
-npm run preview
-```
+### Option 2: Manual Configuration
+
+1. Create a new Web Service on Render
+2. Connect your repository
+3. Configure:
+   - **Build Command**: `npm install`
+   - **Start Command**: `npm start`
+   - **Environment**: Node
+
+### Environment Variables
+
+Make sure to set your Cloudflare Turnstile keys in Render's environment variables:
+- `CLOUDFLARE_SITE_KEY` (already in your .env)
+- `CLOUDFLARE_SECRET_KEY` (already in your .env)
 
 ## Project Structure
 
 ```
-Website/
-├── src/
-│   ├── components/          # Modular React components
-│   │   ├── Header.jsx      # Navigation header
-│   │   ├── Hero.jsx        # Hero section
-│   │   ├── Services.jsx    # Services showcase
-│   │   ├── Contact.jsx     # Contact information
-│   │   └── Footer.jsx      # Footer component
-│   ├── App.jsx             # Main app component
-│   ├── main.jsx            # React entry point
-│   └── index.css           # Global styles
-├── index.html              # HTML template
-├── package.json            # Dependencies
-├── vite.config.js          # Vite configuration
-├── tailwind.config.js      # Tailwind configuration
-└── postcss.config.js       # PostCSS configuration
+├── index.html      # Main HTML file
+├── styles.css      # All styles and animations
+├── script.js       # JavaScript functionality
+├── server.js       # Express server for Render
+├── package.json    # Dependencies and scripts
+├── render.yaml     # Render deployment configuration
+└── .env           # Environment variables (not committed)
 ```
 
-## Adding New Pages/Sections
+## Technologies Used
 
-The site is built with modularity in mind. To add new sections:
-
-1. Create a new component in `src/components/`
-2. Import and add it to `src/App.jsx`
-3. Update navigation links in `src/components/Header.jsx` if needed
-
-## Customization
-
-### Colors
-
-The brand colors are defined in `tailwind.config.js`. The primary brand green color is `#00FF88`.
-
-### Animations
-
-Animations are handled by Framer Motion. Each component uses motion variants for smooth, performant animations.
-
-## License
-
-© 2024 FlyNuka. All rights reserved.
-
+- HTML5
+- CSS3 (with animations and transitions)
+- Vanilla JavaScript (ES6+)
+- Express.js (for Render deployment)
+- Font Awesome 6.5.1
+- Cloudflare Turnstile
 
