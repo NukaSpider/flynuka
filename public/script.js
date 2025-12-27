@@ -182,14 +182,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // Note: Dynamic elements (service cards, stat items, contact items, portfolio items)
     // are observed when they're created in their respective load functions
     
-    // Initialize EmailJS (optional - EmailJS v3 works without init, but init is recommended for security)
-    // Get your Public Key from: https://dashboard.emailjs.com/admin/integration
-    if (typeof emailjs !== 'undefined') {
-        if (EMAILJS_PUBLIC_KEY && EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY') {
-            emailjs.init(EMAILJS_PUBLIC_KEY);
+    // Initialize EmailJS - wait for script to load
+    function initEmailJS() {
+        if (typeof emailjs !== 'undefined') {
+            if (EMAILJS_PUBLIC_KEY && EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY') {
+                emailjs.init(EMAILJS_PUBLIC_KEY);
+            }
+        } else {
+            // Retry if EmailJS hasn't loaded yet
+            setTimeout(initEmailJS, 100);
         }
-        // EmailJS will still work without init, but using a public key is recommended
     }
+    
+    // Start initialization
+    initEmailJS();
     
     // Load and display dynamic content
     loadAboutContent();

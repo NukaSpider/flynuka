@@ -13,7 +13,7 @@ app.use(helmet({
         directives: {
             defaultSrc: ["'self'"],
             styleSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
-            scriptSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://challenges.cloudflare.com", "https://cdn.emailjs.com"],
+            scriptSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://challenges.cloudflare.com", "https://cdn.emailjs.com", "https://cdn.jsdelivr.net"],
             imgSrc: ["'self'", "data:", "https:", "http:"],
             connectSrc: ["'self'", "https://api.short.io", "https://api.emailjs.com", "https://challenges.cloudflare.com"],
             fontSrc: ["'self'", "https://cdnjs.cloudflare.com"],
