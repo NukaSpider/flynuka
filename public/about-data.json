@@ -1,0 +1,24 @@
+{
+    "paragraphs": [
+        "Professional drone pilot specializing in capturing accurate and detailed data for inspections and mapping. With expertise in remote piloting, I bring unique perspectives to every project.",
+        "Whether it's infrastructure, events, or creative projects, I deliver high-quality aerial content that tells your story from above."
+    ],
+    "stats": [
+        {
+            "icon": "fas fa-camera",
+            "value": "500+",
+            "label": "Projects Completed"
+        },
+        {
+            "icon": "fas fa-clock",
+            "value": "1000+",
+            "label": "Hours of Flight"
+        },
+        {
+            "icon": "fas fa-certificate",
+            "value": "FAA",
+            "label": "Certified Pilot"
+        }
+    ]
+}
+

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joseph Duguay | Remote Pilot | FlyNuka</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-drone"></i>
+                <span>FlyNuka</span>
+            </div>
+            <div class="nav-toggle" id="themeToggle">
+                <i class="fas fa-moon" id="themeIcon"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-background">
+            <div class="green-shape shape-top"></div>
+            <div class="green-shape shape-right"></div>
+        </div>
+        <div class="hero-content">
+            <h1 class="hero-title">
+                <span class="text-green">Drone Photography</span>
+                <span class="text-black"> and </span>
+                <span class="text-green">Videography</span>
+            </h1>
+            <div class="hero-subtitle">
+                <h2 class="name">Joseph Duguay</h2>
+                <p class="title">Remote Pilot</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about" id="about">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-user"></i>
+                    About Me
+                </h2>
+            </div>
+            <div class="about-content">
+                <div class="about-text" id="aboutText">
+                    <!-- About paragraphs will be loaded dynamically from about-data.json -->
+                </div>
+                <div class="about-stats" id="aboutStats">
+                    <!-- Stats will be loaded dynamically from about-data.json -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services" id="services">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-briefcase"></i>
+                    Services
+                </h2>
+            </div>
+            <div class="services-grid" id="servicesGrid">
+                <!-- Services will be loaded dynamically from services-data.json -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio/Personal Section -->
+    <section class="portfolio" id="portfolio">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-images"></i>
+                    Portfolio
+                </h2>
+            </div>
+            <div class="portfolio-grid" id="portfolioGrid">
+                <!-- Portfolio items will be loaded dynamically from portfolio-data.json -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact" id="contact">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-envelope"></i>
+                    Get In Touch
+                </h2>
+            </div>
+            <div class="contact-content">
+                <div class="contact-info" id="contactInfo">
+                    <!-- Contact items will be loaded dynamically from contact-data.json -->
+                </div>
+                <form class="contact-form" id="contactForm">
+                    <div class="form-group">
+                        <input type="text" id="name" name="name" placeholder="Your Name" required>
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" id="email" name="email" placeholder="Your Email" required>
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="form-group">
+                        <textarea id="message" name="message" placeholder="Your Message" rows="5" required></textarea>
+                        <i class="fas fa-comment"></i>
+                    </div>
+                    <button type="submit" class="btn-submit">
+                        <span>Send Message</span>
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Joseph Duguay | FlyNuka. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Cloudflare Turnstile Modal -->
+    <div class="modal" id="captchaModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Complete Verification</h3>
+                <button class="modal-close" id="closeModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Please complete the security check below:</p>
+                <div id="turnstile-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Portfolio Detail Modal -->
+    <div class="modal portfolio-modal" id="portfolioModal">
+        <div class="modal-content portfolio-modal-content">
+            <div class="modal-header">
+                <h3 id="portfolioModalTitle">Portfolio Item</h3>
+                <button class="modal-close" id="closePortfolioModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body portfolio-modal-body">
+                <div class="portfolio-modal-image-container">
+                    <img id="portfolioModalImage" src="" alt="Portfolio item">
+                </div>
+                <div class="portfolio-modal-description">
+                    <p id="portfolioModalDescription"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <p>Sending message...</p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+

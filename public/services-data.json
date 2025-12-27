@@ -1,0 +1,27 @@
+[
+    {
+        "id": 1,
+        "icon": "fas fa-home",
+        "title": "Real Estate",
+        "description": "Aerial photography and videography for property listings, showcasing properties from unique perspectives."
+    },
+    {
+        "id": 2,
+        "icon": "fas fa-calendar-alt",
+        "title": "Events",
+        "description": "Capture weddings, festivals, and corporate events with dynamic aerial shots that tell your story."
+    },
+    {
+        "id": 3,
+        "icon": "fas fa-video",
+        "title": "Commercial Video",
+        "description": "Professional aerial videography for commercials, promotional content, and marketing campaigns."
+    },
+    {
+        "id": 4,
+        "icon": "fas fa-tower-cell",
+        "title": "Inspections",
+        "description": "Get accurate RTK enabled data for inspections and mapping, inlcuding but not limited to: cell towers, power lines, and more."
+    }
+]
+

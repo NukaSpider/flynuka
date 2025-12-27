@@ -1,0 +1,21 @@
+{
+    "contactItems": [
+        {
+            "id": 1,
+            "icon": "fas fa-phone",
+            "label": "Phone",
+            "value": "+1 (719) 666-1812",
+            "link": "tel:+17196661812",
+            "type": "phone"
+        },
+        {
+            "id": 2,
+            "icon": "fab fa-instagram",
+            "label": "Instagram",
+            "value": "@flynuka",
+            "link": "https://instagram.com/flynuka",
+            "type": "social"
+        }
+    ]
+}
+
