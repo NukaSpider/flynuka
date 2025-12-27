@@ -70,8 +70,8 @@
 .contact-form {
   background: var(--bg-secondary);
   padding: 3rem;
-  border-radius: 20px;
-  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
 .form-group {
@@ -96,20 +96,20 @@
 .form-group textarea {
   width: 100%;
   padding: 1rem 1.5rem;
-  border: 2px solid var(--border-color);
-  border-radius: 12px;
+  border: none;
+  border-radius: 16px;
   background: var(--bg-primary);
   color: var(--text-primary);
   font-size: 1rem;
   font-family: inherit;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: var(--lime-green);
-  box-shadow: 0 0 0 3px var(--lime-green-glow);
+  box-shadow: 0 0 0 3px var(--lime-green-glow), 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .form-group textarea {
@@ -138,7 +138,7 @@
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(5px);
+  backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -148,11 +148,11 @@
 
 .modal-content {
   background: var(--bg-primary);
-  border-radius: 20px;
+  border-radius: 24px;
   max-width: 500px;
   width: 100%;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--border-color);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  overflow: hidden;
 }
 
 .modal-header {
@@ -160,7 +160,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 2rem 2rem 1rem;
-  border-bottom: 1px solid var(--border-color);
+  background: linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  border-bottom: none;
 }
 
 .modal-header h3 {

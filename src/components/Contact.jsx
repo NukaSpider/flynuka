@@ -71,33 +71,79 @@ const Contact = () => {
   }
 
   useEffect(() => {
-    if (showCaptchaModal && window.turnstile && captchaRef.current) {
-      // Render Turnstile when modal opens
+    if (showCaptchaModal && captchaRef.current) {
       const siteKey = import.meta.env.VITE_CLOUDFLARE_SITE_KEY
-      if (siteKey) {
-        const widgetId = window.turnstile.render(captchaRef.current, {
-          sitekey: siteKey,
-          callback: (token) => {
-            setCaptchaToken(token)
-            setShowCaptchaModal(false)
-            submitForm(token)
-          },
-          'error-callback': () => {
-            console.error('Turnstile error')
-          },
-        })
-        setCaptchaWidgetId(widgetId)
+      
+      if (!siteKey) {
+        console.error('Cloudflare site key is missing')
+        return
+      }
 
-        // Cleanup function
+      // Function to load and render Turnstile
+      const loadTurnstile = () => {
+        if (window.turnstile && captchaRef.current) {
+          try {
+            const widgetId = window.turnstile.render(captchaRef.current, {
+              sitekey: siteKey,
+              callback: (token) => {
+                setCaptchaToken(token)
+                setShowCaptchaModal(false)
+                submitForm(token)
+              },
+              'error-callback': () => {
+                console.error('Turnstile error')
+              },
+            })
+            setCaptchaWidgetId(widgetId)
+          } catch (error) {
+            console.error('Error rendering Turnstile:', error)
+          }
+        }
+      }
+
+      // Check if Turnstile is already loaded
+      if (window.turnstile) {
+        loadTurnstile()
+      } else {
+        // Wait for Turnstile script to load
+        const checkTurnstile = setInterval(() => {
+          if (window.turnstile) {
+            clearInterval(checkTurnstile)
+            loadTurnstile()
+          }
+        }, 100)
+
+        // Timeout after 5 seconds
+        setTimeout(() => {
+          clearInterval(checkTurnstile)
+          if (!window.turnstile) {
+            console.error('Cloudflare Turnstile failed to load')
+          }
+        }, 5000)
+
+        // Cleanup interval on unmount
         return () => {
-          if (widgetId && window.turnstile) {
-            window.turnstile.remove(widgetId)
+          clearInterval(checkTurnstile)
+        }
+      }
+
+      // Cleanup function
+      return () => {
+        if (captchaWidgetId && window.turnstile) {
+          try {
+            window.turnstile.remove(captchaWidgetId)
+          } catch (error) {
+            console.error('Error removing Turnstile:', error)
           }
         }
       }
     } else if (!showCaptchaModal && captchaWidgetId && window.turnstile) {
       // Reset captcha when modal closes
-      window.turnstile.remove(captchaWidgetId)
+      try {
+        window.turnstile.remove(captchaWidgetId)
+      } catch (error) {
+        console.error('Error removing Turnstile:', error)
+      }
       setCaptchaWidgetId(null)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
