@@ -11,8 +11,24 @@ const EMAILJS_PUBLIC_KEY = 'JhDUSfAjpAQMBdV1n'; // Replace with your EmailJS Pub
 // Theme Toggle
 const html = document.documentElement;
 
+// Cookie helper functions
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+}
+
+function setCookie(name, value, days = 365) {
+    const expires = new Date();
+    expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+    const isSecure = window.location.protocol === 'https:';
+    const secureFlag = isSecure ? ';Secure' : '';
+    document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Strict${secureFlag}`;
+}
+
 // Check for saved theme preference or default to light mode
-const currentTheme = localStorage.getItem('theme') || 'light';
+const currentTheme = getCookie('theme') || 'light';
 html.setAttribute('data-theme', currentTheme);
 
 function updateThemeIcon(theme, themeIcon) {
@@ -137,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Smooth theme transition
             html.style.transition = 'background-color 0.4s ease, color 0.4s ease';
             html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
+            setCookie('theme', newTheme);
             updateThemeIcon(newTheme, themeIcon);
         });
     }
